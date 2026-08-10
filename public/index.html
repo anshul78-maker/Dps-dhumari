@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhumari Public School — ERP</title>
+<link rel="icon" type="image/jpeg" href="/img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-mark brand-img" src="/img/logo.jpg" alt="Dhumari Public School crest">
+        <div>
+          <div class="brand-name">Dhumari Public School</div>
+          <div class="brand-sub" id="roleLabel">ERP</div>
+        </div>
+      </div>
+      <nav id="nav" class="nav"></nav>
+      <div class="side-foot">
+        <div class="me">
+          <div class="me-ini" id="meIni">–</div>
+          <div>
+            <div class="me-name" id="meName">–</div>
+            <div class="me-role" id="meRole">–</div>
+          </div>
+        </div>
+        <button id="logout" class="btn btn-ghost btn-block">Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle" class="page-title">Dashboard</h1>
+          <div id="pageSub" class="page-sub"></div>
+        </div>
+        <div id="dateline" class="dateline"></div>
+      </header>
+      <section id="view" class="view"></section>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/notices.js"></script>
+  <script src="/js/student.js"></script>
+  <script src="/js/teacher.js"></script>
+  <script src="/js/accountant.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

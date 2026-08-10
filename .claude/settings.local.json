@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"D:/Dps School Project/school-erp\" status)"
+    ]
+  }
+}

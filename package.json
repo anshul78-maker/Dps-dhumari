@@ -1,0 +1,23 @@
+{
+  "name": "school-erp",
+  "version": "1.0.0",
+  "description": "WeTakeFwd School ERP — Student, Teacher, Accountant (no AI, full-stack)",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "seed": "node server/db.js --reseed"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "node-sqlite3-wasm": "^0.8.59"
+  }
+}

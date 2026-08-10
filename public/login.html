@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dhumari Public School ERP</title>
+<link rel="icon" type="image/jpeg" href="/img/logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="login-body">
+  <div class="home">
+    <div class="home-head">
+      <img class="home-crest" src="/img/logo.jpg" alt="Dhumari Public School crest">
+      <h1 class="home-title">Dhumari Public School</h1>
+      <div class="home-sub">Etah · Estd. 2002 · School ERP</div>
+    </div>
+
+    <p class="home-lead">Choose your role to open your dashboard</p>
+
+    <div class="role-grid">
+      <button class="role-card" data-u="priya" data-p="priya123">
+        <span class="role-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v4.5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5V12"/><path d="M22 10v5"/>
+          </svg>
+        </span>
+        <span class="role-name">Student</span>
+        <span class="role-desc">Marks, attendance, assignments, report card, certificates &amp; fees</span>
+        <span class="role-go">Open dashboard →</span>
+      </button>
+
+      <button class="role-card" data-u="verma" data-p="verma123">
+        <span class="role-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 9l2.4 2.4L15 7"/><path d="M12 16v4M8 20h8"/>
+          </svg>
+        </span>
+        <span class="role-name">Teacher</span>
+        <span class="role-desc">Attendance, marks, assignments, submissions &amp; report cards</span>
+        <span class="role-go">Open dashboard →</span>
+      </button>
+
+      <button class="role-card" data-u="nair" data-p="nair123">
+        <span class="role-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><path d="M9.5 8h5M9.5 11h5M13.5 8c.4 2.6-1.4 3.6-4 3.6l3.8 3.9"/>
+          </svg>
+        </span>
+        <span class="role-name">Accountant</span>
+        <span class="role-desc">Fees overview, add fees, mark paid &amp; transfer certificates</span>
+        <span class="role-go">Open dashboard →</span>
+      </button>
+    </div>
+
+    <div id="err" class="form-error" style="text-align:center"></div>
+
+    <button class="link-btn" id="manualToggle" type="button">Sign in with a username and password instead</button>
+
+    <div class="manual" id="manual" hidden>
+      <label class="field-label" for="u">Username</label>
+      <input id="u" class="field" type="text" autocomplete="username" placeholder="e.g. priya">
+      <label class="field-label" for="p">Password</label>
+      <input id="p" class="field" type="password" autocomplete="current-password" placeholder="••••••••">
+      <button id="signin" class="btn btn-primary btn-block">Sign in</button>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>

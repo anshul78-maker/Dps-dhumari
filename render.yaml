@@ -1,0 +1,17 @@
+# Render Blueprint — deploys the Dhumari Public School ERP as a Node web service.
+# On Render: New +  →  Blueprint  →  pick this repo. Render reads this file,
+# builds the app, and gives you a public https:// link.
+services:
+  - type: web
+    name: dhumari-public-school-erp
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      # Render sets PORT automatically — the server already reads it.
+      - key: NODE_VERSION
+        value: "20"
+      # A long random login-token secret, generated once by Render.
+      - key: JWT_SECRET
+        generateValue: true
