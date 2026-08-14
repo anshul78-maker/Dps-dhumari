@@ -1,10 +1,80 @@
 const AccountantApp = {
   pages: [
     { label: "Fees overview",  render: () => AccountantApp.overview() },
+    { label: "Students",       render: () => AccountantApp.students() },
     { label: "Add fee",        render: () => AccountantApp.addFee() },
     { label: "Transfer Cert.", render: () => AccountantApp.tc() },
     { label: "Notices",        render: () => Notices.render() }
   ],
+
+  // Full student roster as a clean, searchable, multi-column table.
+  async students() {
+    setTitle("Students", "Every student on record, by class");
+    view().innerHTML = `<div class="empty">Loading…</div>`;
+    let d;
+    try { d = await API.get("/api/accountant/students"); }
+    catch (e) { view().innerHTML = `<div class="empty">${e.message}</div>`; return; }
+
+    const all = d.students;
+    const classNames = [...new Set(all.map(s => s.class_name))];
+    const classOpts = `<option value="">All classes (${all.length})</option>` +
+      classNames.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+
+    view().innerHTML = `
+      <div class="card">
+        <div class="roster-bar">
+          <div class="roster-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            <input id="rSearch" type="search" placeholder="Search name, roll, guardian or phone…">
+          </div>
+          <select id="rClass" class="roster-select">${classOpts}</select>
+          <span class="roster-count" id="rCount"></span>
+        </div>
+        <div class="roster-scroll">
+          <table class="table roster-table">
+            <thead><tr>
+              <th style="width:64px">Roll</th>
+              <th>Name</th>
+              <th>Class</th>
+              <th>Gender</th>
+              <th>Guardian</th>
+              <th>Phone</th>
+            </tr></thead>
+            <tbody id="rBody"></tbody>
+          </table>
+        </div>
+      </div>`;
+
+    const body = document.getElementById("rBody");
+    const count = document.getElementById("rCount");
+    const search = document.getElementById("rSearch");
+    const clsSel = document.getElementById("rClass");
+
+    const draw = () => {
+      const q = search.value.trim().toLowerCase();
+      const cls = clsSel.value;
+      const rows = all.filter(s =>
+        (!cls || s.class_name === cls) &&
+        (!q || [s.name, s.roll, s.guardian_name, s.phone, s.admission_no]
+          .some(v => String(v ?? "").toLowerCase().includes(q))));
+      count.textContent = `${rows.length} student${rows.length === 1 ? "" : "s"}`;
+      body.innerHTML = rows.length ? rows.map(s => `
+        <tr>
+          <td class="roster-roll">${esc(s.roll ?? "—")}</td>
+          <td class="roster-name">${esc(s.name)}</td>
+          <td><span class="pill">${esc(s.class_name)}</span></td>
+          <td>${esc(s.gender || "—")}</td>
+          <td>${esc(s.guardian_name || "—")}</td>
+          <td>${s.phone ? esc(s.phone) : `<span class="check-meta">—</span>`}</td>
+        </tr>`).join("")
+        : `<tr><td colspan="6" class="empty">No students match your search.</td></tr>`;
+    };
+    draw();
+    search.addEventListener("input", draw);
+    clsSel.addEventListener("change", draw);
+  },
 
   async overview() {
     setTitle("Fees overview", "Dues and payments across all students");

@@ -427,6 +427,13 @@ export function getDocumentById(id) {
 export function allStudents() {
   return db.all("SELECT id, name, class_name, roll FROM users WHERE role='student' ORDER BY class_name, roll");
 }
+// Fuller roster for the accountant's Students table (no sensitive fields).
+export function studentsRoster() {
+  return db.all(`
+    SELECT id, name, class_name, roll, admission_no, gender, guardian_name, phone
+    FROM users WHERE role='student'
+    ORDER BY class_name, roll`);
+}
 export function addFee(studentId, title, amount, period) {
   db.run("INSERT INTO fees (student_id, title, amount, period, status) VALUES (?,?,?,?, 'due')",
     [studentId, title, amount, period]);

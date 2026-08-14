@@ -4,7 +4,7 @@
    - API calls (/api/*): network-first (always try fresh data, fall back to cache).
    - Everything else (HTML/CSS/JS/img): cache-first, updated in the background.
 */
-const CACHE = "dps-erp-v2";
+const CACHE = "dps-erp-v4";
 const SHELL = [
   "/login.html",
   "/index.html",
