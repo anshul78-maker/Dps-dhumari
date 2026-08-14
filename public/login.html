@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dhumari Public School ERP</title>
 <link rel="icon" type="image/jpeg" href="/img/logo.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<!-- PWA -->
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#b0182b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DPS ERP">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -79,6 +88,8 @@
 
     <button class="link-btn" id="manualToggle" type="button">Sign in with a username and password instead</button>
 
+    <button class="btn btn-teal" id="installApp" type="button" hidden style="margin:14px auto 0;display:block">⬇ Install app on this device</button>
+
     <div class="manual" id="manual" hidden>
       <label class="field-label" for="u">Username</label>
       <input id="u" class="field" type="text" autocomplete="username" placeholder="e.g. priya">
@@ -90,5 +101,6 @@
 
   <script src="/js/api.js"></script>
   <script src="/js/login.js"></script>
+  <script src="/js/pwa.js"></script>
 </body>
 </html>
