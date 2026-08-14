@@ -6,37 +6,64 @@
 <title>DPS Dhumari — School ERP</title>
 <style>
   :root{
-    --primary:#1e3a8a; --primary-light:#3b5bdb; --accent:#0ea5e9;
-    --bg:#f1f5f9; --card:#ffffff; --text:#1e293b; --muted:#64748b;
-    --border:#e2e8f0; --green:#16a34a; --red:#dc2626; --amber:#d97706;
+    /* Palette pulled from the Dhumari Public School crest: crimson + gold. */
+    --primary:#b0182b; --primary-light:#c11d31; --primary-dark:#8c111f;
+    --accent:#c69214; --accent-light:#e6c260;
+    --bg:#f5f1ec; --card:#ffffff; --text:#26161a; --muted:#7a6a6e;
+    --border:#ece2dd; --green:#2e9e6b; --red:#c8483a; --amber:#d97706;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
   a{color:inherit;text-decoration:none}
+  /* Splash / loading screen */
+  @keyframes splashFade{to{opacity:0;visibility:hidden}}
+  @keyframes crestPop{0%{opacity:0;transform:scale(.6) translateY(12px)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  @keyframes barFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes floatUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+    background:radial-gradient(130% 130% at 50% 0%, #b0182b 0%, #8c111f 45%, #660c14 100%);
+    animation:splashFade .55s ease 2s forwards}
+  .splash-inner{text-align:center;color:#fff}
+  .splash-badge{width:110px;height:110px;margin:0 auto;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 38%, #e6c260, #c69214 70%);
+    color:#7a0f16;font-weight:800;font-size:1.9rem;letter-spacing:.06em;font-family:'Segoe UI',sans-serif;
+    box-shadow:0 18px 50px rgba(0,0,0,.4), 0 0 0 6px rgba(255,255,255,.14), inset 0 0 0 4px rgba(122,15,22,.25);
+    animation:crestPop .85s cubic-bezier(.2,.85,.25,1) both}
+  .splash-name{font-weight:700;font-size:1.5rem;margin-top:22px;animation:floatUp .6s ease .38s both}
+  .splash-sub{font-size:.72rem;opacity:.85;margin-top:7px;letter-spacing:.16em;text-transform:uppercase;animation:floatUp .6s ease .52s both}
+  .splash-bar{width:190px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:28px auto 0;overflow:hidden}
+  .splash-bar>span{display:block;height:100%;border-radius:4px;transform-origin:left;
+    background:linear-gradient(90deg,#e6c260,#c69214);animation:barFill 1.7s ease .15s both}
   /* Sidebar */
-  .sidebar{width:230px;background:var(--primary);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto}
-  .brand{padding:20px 18px;font-weight:700;font-size:1.05rem;line-height:1.3;border-bottom:1px solid rgba(255,255,255,.15)}
+  .sidebar{width:230px;background:linear-gradient(180deg,#b0182b,#8c111f 60%,#7a0f16);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;box-shadow:2px 0 18px rgba(122,15,22,.18)}
+  .brand{padding:20px 18px;font-weight:700;font-size:1.05rem;line-height:1.3;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:11px}
+  .brand-badge{width:34px;height:34px;flex:none;border-radius:9px;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 38%, #e6c260, #c69214 75%);color:#7a0f16;font-weight:800;font-size:.82rem;letter-spacing:.02em;box-shadow:inset 0 0 0 2px rgba(122,15,22,.25)}
   .brand small{display:block;font-weight:400;font-size:.72rem;opacity:.8;margin-top:3px}
-  .nav a{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:.92rem;opacity:.85;border-left:3px solid transparent}
+  .nav a{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:.92rem;opacity:.85;border-left:3px solid transparent;transition:background .16s,opacity .16s,border-color .16s}
   .nav a:hover{background:rgba(255,255,255,.08);opacity:1}
-  .nav a.active{background:rgba(255,255,255,.12);border-left-color:var(--accent);opacity:1;font-weight:600}
+  .nav a.active{background:rgba(255,255,255,.14);border-left-color:var(--accent-light);opacity:1;font-weight:600}
   .nav .ic{width:20px;text-align:center}
   /* Main */
   .main{margin-left:230px;flex:1;padding:24px 28px;width:calc(100% - 230px)}
   .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-  .topbar h1{font-size:1.4rem;color:var(--primary)}
-  .btn{background:var(--primary);color:#fff;border:none;padding:9px 16px;border-radius:7px;font-size:.88rem;cursor:pointer;font-weight:500}
-  .btn:hover{background:var(--primary-light)}
-  .btn.sec{background:#fff;color:var(--primary);border:1px solid var(--border)}
-  .btn.danger{background:var(--red)}
+  .topbar h1{font-size:1.4rem;color:var(--primary);position:relative;padding-bottom:10px}
+  .topbar h1::after{content:"";position:absolute;left:0;bottom:0;width:52px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+  .btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;padding:9px 16px;border-radius:7px;font-size:.88rem;cursor:pointer;font-weight:500;box-shadow:0 5px 14px rgba(176,24,43,.26);transition:transform .15s,box-shadow .15s,background .15s}
+  .btn:hover{background:linear-gradient(135deg,var(--primary-light),#7a0f1b);transform:translateY(-1px);box-shadow:0 8px 20px rgba(176,24,43,.34)}
+  .btn.sec{background:#fff;color:var(--primary);border:1px solid var(--border);box-shadow:none}
+  .btn.sec:hover{background:#faf2f3;border-color:var(--primary)}
+  .btn.danger{background:linear-gradient(135deg,#d6533f,#b23324)}
   .btn.sm{padding:5px 10px;font-size:.78rem}
   /* Cards */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px}
-  .stat{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .stat{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(60,20,25,.06),0 8px 22px rgba(60,20,25,.05);border:1px solid var(--border);position:relative;overflow:hidden;animation:floatUp .5s ease both;transition:transform .18s,box-shadow .18s}
+  .stat::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+  .stat:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(60,20,25,.06),0 16px 36px rgba(176,24,43,.12)}
   .stat .label{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
-  .stat .value{font-size:1.9rem;font-weight:700;margin-top:6px;color:var(--primary)}
+  .stat .value{font-size:1.9rem;font-weight:700;margin-top:6px;background:linear-gradient(120deg,var(--primary-dark),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .stat .sub{font-size:.78rem;color:var(--muted);margin-top:4px}
-  .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px}
+  .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(60,20,25,.06),0 8px 22px rgba(60,20,25,.05);margin-bottom:20px;border:1px solid var(--border);animation:floatUp .5s ease both}
   .card h3{margin-bottom:14px;font-size:1.05rem;color:var(--primary)}
   /* Table */
   table{width:100%;border-collapse:collapse;font-size:.88rem}
@@ -64,12 +91,22 @@
   .empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .hide{display:none!important}
-  @media(max-width:720px){.sidebar{width:60px}.brand small,.nav a span.txt{display:none}.main{margin-left:60px;width:calc(100% - 60px);padding:16px}.row2{grid-template-columns:1fr}}
+  @media(max-width:720px){.sidebar{width:60px}.brand small,.brand-badge,.nav a span.txt{display:none}.main{margin-left:60px;width:calc(100% - 60px);padding:16px}.row2{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.splash{animation:splashFade .4s ease .4s forwards}.splash-badge,.splash-name,.splash-sub,.splash-bar>span,.stat,.card{animation:none}}
 </style>
 </head>
 <body>
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-badge">DPS</div>
+      <div class="splash-name">Dhumari Public School</div>
+      <div class="splash-sub">Etah · Estd. 2002</div>
+      <div class="splash-bar"><span></span></div>
+    </div>
+  </div>
+
   <aside class="sidebar">
-    <div class="brand">DPS Dhumari<small>School ERP</small></div>
+    <div class="brand"><span class="brand-badge">DPS</span><span>Dhumari Public School<small>School ERP</small></span></div>
     <nav class="nav" id="nav">
       <a data-view="dashboard" class="active"><span class="ic">◱</span><span class="txt">Dashboard</span></a>
       <a data-view="students"><span class="ic">🎓</span><span class="txt">Students</span></a>

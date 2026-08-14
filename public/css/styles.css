@@ -76,7 +76,7 @@ a{color:inherit}
 .home-title{font-size:27px;margin-top:16px}
 .home-sub{color:var(--ink-soft);font-size:13px;margin-top:5px;letter-spacing:.02em}
 .home-lead{text-align:center;color:var(--ink-soft);font-size:15px;margin:24px 0 18px}
-.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .role-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;text-align:left;
   background:#fbf6f3;border:1px solid var(--line);border-radius:16px;padding:20px 17px;cursor:pointer;
   font-family:inherit;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s,background .15s}
@@ -245,4 +245,94 @@ label.btn{position:relative;cursor:pointer}
   .side-foot .btn-block{width:auto;margin-top:0}
   .cols-3{grid-template-columns:1fr}
   .cols-2{grid-template-columns:1fr}
+}
+
+/* ============================================================
+   DESIGN UPGRADE — splash screen, motion & richer crest visuals
+   Palette pulled straight from the school crest: crimson + gold.
+   ============================================================ */
+
+/* ---- animation keywords ---- */
+@keyframes splashFade{to{opacity:0;visibility:hidden}}
+@keyframes crestPop{
+  0%{opacity:0;transform:scale(.6) translateY(12px)}
+  60%{opacity:1;transform:scale(1.06)}
+  100%{opacity:1;transform:scale(1)}}
+@keyframes barFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes floatUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+@keyframes shimmer{to{background-position:200% 0}}
+
+/* ---- Splash / loading screen ---- */
+.splash{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:radial-gradient(130% 130% at 50% 0%, #b0182b 0%, #8c111f 45%, #660c14 100%);
+  animation:splashFade .55s ease 2s forwards}
+.splash::after{ /* subtle gold vignette glow */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 40% at 50% 42%, rgba(230,194,96,.18), transparent 70%)}
+.splash-inner{position:relative;text-align:center;color:#fff}
+.splash-crest{
+  width:118px;height:118px;border-radius:26px;object-fit:cover;
+  box-shadow:0 20px 55px rgba(0,0,0,.45), 0 0 0 6px rgba(255,255,255,.12);
+  animation:crestPop .85s cubic-bezier(.2,.85,.25,1) both}
+.splash-name{
+  font-family:"Sora",sans-serif;font-weight:700;font-size:26px;margin-top:22px;
+  letter-spacing:.3px;animation:floatUp .6s ease .38s both}
+.splash-sub{
+  font-size:12px;opacity:.85;margin-top:7px;letter-spacing:.16em;text-transform:uppercase;
+  animation:floatUp .6s ease .52s both}
+.splash-bar{
+  width:190px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);
+  margin:28px auto 0;overflow:hidden}
+.splash-bar>span{
+  display:block;height:100%;border-radius:4px;transform-origin:left;
+  background:linear-gradient(90deg,#e6c260,#c69214);animation:barFill 1.7s ease .15s both}
+
+/* ---- entrance motion for the real UI ---- */
+.login-body .home,.login-body .login-card{animation:floatUp .55s ease both}
+.role-card{animation:floatUp .5s ease both;animation-delay:calc(.06s * var(--i, 0))}
+.card{animation:floatUp .5s ease both;animation-delay:calc(.05s * var(--i, 0))}
+.nav-item{animation:floatUp .4s ease both;animation-delay:calc(.04s * var(--i, 0))}
+
+/* ---- richer crest visuals ---- */
+.login-body{
+  background:
+    radial-gradient(900px 420px at 50% -8%, #f7dfe2, transparent 70%),
+    radial-gradient(700px 380px at 90% 110%, #f6ecd6, transparent 70%),
+    var(--bg)}
+.btn-primary{
+  background:linear-gradient(135deg,#b0182b,#8c111f);
+  box-shadow:0 6px 16px rgba(176,24,43,.28)}
+.btn-primary:hover{background:linear-gradient(135deg,#c11d31,#7a0f1b);
+  box-shadow:0 8px 22px rgba(176,24,43,.36);transform:translateY(-1px)}
+.btn-teal{background:linear-gradient(135deg,#e0b64a,#c69214)}
+.btn-teal:hover{background:linear-gradient(135deg,#e9c65f,#a97c0e)}
+.role-ic{
+  background:linear-gradient(135deg,#fbe4e8,#f6ecd3);
+  box-shadow:inset 0 0 0 1px rgba(198,146,20,.18)}
+.role-card:hover .role-ic{
+  background:linear-gradient(135deg,#b0182b,#c69214);color:#fff;transform:scale(1.05)}
+.role-ic{transition:background .2s,color .2s,transform .2s}
+.nav-item.active{
+  background:linear-gradient(135deg,#fbe9ec,#f9f0dd);
+  box-shadow:inset 3px 0 0 var(--navy)}
+.brand-name{
+  background:linear-gradient(90deg,#b0182b,#c69214);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat-num{
+  background:linear-gradient(120deg,#8c111f,#c69214);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.topbar{position:relative;padding-bottom:16px}
+.topbar::after{
+  content:"";position:absolute;left:0;bottom:0;width:60px;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,#b0182b,#c69214)}
+.card{transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(60,20,25,.06),0 16px 40px rgba(60,20,25,.12)}
+
+/* respect users who prefer no motion */
+@media (prefers-reduced-motion:reduce){
+  .splash{animation:splashFade .4s ease .4s forwards}
+  .splash-crest,.splash-name,.splash-sub,.splash-bar>span,
+  .role-card,.card,.nav-item,.login-body .home,.login-body .login-card{animation:none}
 }
