@@ -1,0 +1,665 @@
+[
+{
+"username": "t3237595",
+"password": "teacher123",
+"role": "teacher",
+"name": "Anil Kumar",
+"employeeId": "3237595",
+"gender": "Male",
+"dob": "1982-11-01",
+"designation": "OTHER",
+"qualification": "BA",
+"gradesTaught": []
+},
+{
+"username": "t3201744",
+"password": "teacher123",
+"role": "teacher",
+"name": "Chetan Rathore",
+"employeeId": "3201744",
+"gender": "Male",
+"dob": "1999-11-10",
+"designation": "TGT",
+"qualification": "B.Sc",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2682080",
+"password": "teacher123",
+"role": "teacher",
+"name": "Nidhi Pachauri",
+"employeeId": "2682080",
+"gender": "Female",
+"dob": "1991-05-29",
+"designation": "PGT",
+"qualification": "M.A.",
+"gradesTaught": [
+"9",
+"10",
+"11",
+"12"
+]
+},
+{
+"username": "t2681555",
+"password": "teacher123",
+"role": "teacher",
+"name": "Atul Kumar",
+"employeeId": "2681555",
+"gender": "Male",
+"dob": "1993-08-07",
+"designation": "TGT",
+"qualification": "MSC",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2681549",
+"password": "teacher123",
+"role": "teacher",
+"name": "Shyam Pal Singh",
+"employeeId": "2681549",
+"gender": "Male",
+"dob": "1987-08-14",
+"designation": "TGT",
+"qualification": "BSC",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2681537",
+"password": "teacher123",
+"role": "teacher",
+"name": "Cheni Kumari",
+"employeeId": "2681537",
+"gender": "Female",
+"dob": "1984-02-15",
+"designation": "TGT",
+"qualification": "M.A.",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2539871",
+"password": "teacher123",
+"role": "teacher",
+"name": "Km Shavnam",
+"employeeId": "2539871",
+"gender": "Female",
+"dob": "2000-07-06",
+"designation": "PRT",
+"qualification": "BA",
+"gradesTaught": [
+"1",
+"2",
+"3"
+]
+},
+{
+"username": "t2535258",
+"password": "teacher123",
+"role": "teacher",
+"name": "Km Richa Shakya",
+"employeeId": "2535258",
+"gender": "Female",
+"dob": "1995-09-10",
+"designation": "PRT",
+"qualification": "BA",
+"gradesTaught": [
+"1",
+"2"
+]
+},
+{
+"username": "t2535129",
+"password": "teacher123",
+"role": "teacher",
+"name": "Nishilika Yadav",
+"employeeId": "2535129",
+"gender": "Female",
+"dob": "1978-12-15",
+"designation": "PRT",
+"qualification": "BA",
+"gradesTaught": [
+"3",
+"4",
+"5"
+]
+},
+{
+"username": "t2534999",
+"password": "teacher123",
+"role": "teacher",
+"name": "Anamika Gupta",
+"employeeId": "2534999",
+"gender": "Female",
+"dob": "2002-01-01",
+"designation": "PRT",
+"qualification": "BSC",
+"gradesTaught": [
+"1",
+"2",
+"3"
+]
+},
+{
+"username": "t2534989",
+"password": "teacher123",
+"role": "teacher",
+"name": "Smrit Shakya",
+"employeeId": "2534989",
+"gender": "Female",
+"dob": "1995-10-10",
+"designation": "TGT",
+"qualification": "BSC",
+"gradesTaught": [
+"6",
+"7",
+"8"
+]
+},
+{
+"username": "t2475642",
+"password": "teacher123",
+"role": "teacher",
+"name": "Hema Singh",
+"employeeId": "2475642",
+"gender": "Female",
+"dob": "1996-10-20",
+"designation": "PGT",
+"qualification": "MSC",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2435616",
+"password": "teacher123",
+"role": "teacher",
+"name": "Sudesh Kumar Tiwari",
+"employeeId": "2435616",
+"gender": "Male",
+"dob": "1992-01-20",
+"designation": "TGT",
+"qualification": "MA",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2430307",
+"password": "teacher123",
+"role": "teacher",
+"name": "Gyanendra Singh",
+"employeeId": "2430307",
+"gender": "Male",
+"dob": "1994-07-01",
+"designation": "PGT",
+"qualification": "M.SC",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2234281",
+"password": "teacher123",
+"role": "teacher",
+"name": "Rashmi",
+"employeeId": "2234281",
+"gender": "Female",
+"dob": "1997-06-21",
+"designation": "PRT",
+"qualification": "BA",
+"gradesTaught": [
+"3",
+"4",
+"5"
+]
+},
+{
+"username": "t2234267",
+"password": "teacher123",
+"role": "teacher",
+"name": "Shabnam Rani",
+"employeeId": "2234267",
+"gender": "Female",
+"dob": "1992-07-24",
+"designation": "TGT",
+"qualification": "BSC",
+"gradesTaught": [
+"6",
+"7",
+"8"
+]
+},
+{
+"username": "t2195230",
+"password": "teacher123",
+"role": "teacher",
+"name": "Yogesh Kumar",
+"employeeId": "2195230",
+"gender": "Male",
+"dob": "1993-04-15",
+"designation": "VICE PRINCIPAL",
+"qualification": "MSC",
+"gradesTaught": [
+"9",
+"10",
+"11",
+"12"
+]
+},
+{
+"username": "t2109703",
+"password": "teacher123",
+"role": "teacher",
+"name": "Seema Mishra",
+"employeeId": "2109703",
+"gender": "Female",
+"dob": "1977-06-01",
+"designation": "TGT",
+"qualification": "BA",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2106560",
+"password": "teacher123",
+"role": "teacher",
+"name": "Shilpi Rajput",
+"employeeId": "2106560",
+"gender": "Female",
+"dob": "1994-02-12",
+"designation": "PGT",
+"qualification": "M.Sc",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2106549",
+"password": "teacher123",
+"role": "teacher",
+"name": "Nandini Gupta",
+"employeeId": "2106549",
+"gender": "Female",
+"dob": "1980-05-01",
+"designation": "PGT",
+"qualification": "M.A.",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2105926",
+"password": "teacher123",
+"role": "teacher",
+"name": "Shivdatt Kumar",
+"employeeId": "2105926",
+"gender": "Male",
+"dob": "1998-07-20",
+"designation": "PET",
+"qualification": "M.A.",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2081836",
+"password": "teacher123",
+"role": "teacher",
+"name": "Rishabh Solanki",
+"employeeId": "2081836",
+"gender": "Male",
+"dob": "1999-08-05",
+"designation": "TGT",
+"qualification": "B.COM",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t2081768",
+"password": "teacher123",
+"role": "teacher",
+"name": "Nikita Gupta",
+"employeeId": "2081768",
+"gender": "Female",
+"dob": "2001-02-16",
+"designation": "PGT",
+"qualification": "B.SC.",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t2003434",
+"password": "teacher123",
+"role": "teacher",
+"name": "Sima Gaur",
+"employeeId": "2003434",
+"gender": "Female",
+"dob": "1975-06-10",
+"designation": "TGT",
+"qualification": "MA",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t1930184",
+"password": "teacher123",
+"role": "teacher",
+"name": "Sukhendra Kumar Pathak",
+"employeeId": "1930184",
+"gender": "Male",
+"dob": "1985-01-05",
+"designation": "PGT",
+"qualification": "M.A.",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t1784122",
+"password": "teacher123",
+"role": "teacher",
+"name": "Laxmi Gupta",
+"employeeId": "1784122",
+"gender": "Female",
+"dob": "1990-06-27",
+"designation": "OTHER",
+"qualification": "BA",
+"gradesTaught": []
+},
+{
+"username": "t1748753",
+"password": "teacher123",
+"role": "teacher",
+"name": "Chandani Pal",
+"employeeId": "1748753",
+"gender": "Female",
+"dob": "1990-07-08",
+"designation": "PRT",
+"qualification": "BA",
+"gradesTaught": [
+"2",
+"3",
+"4",
+"5"
+]
+},
+{
+"username": "t1608728",
+"password": "teacher123",
+"role": "teacher",
+"name": "Ved Prakash",
+"employeeId": "1608728",
+"gender": "Male",
+"dob": "1976-08-05",
+"designation": "TGT",
+"qualification": "BA",
+"gradesTaught": [
+"9",
+"10"
+]
+},
+{
+"username": "t1608724",
+"password": "teacher123",
+"role": "teacher",
+"name": "Dhermendra Kumar",
+"employeeId": "1608724",
+"gender": "Male",
+"dob": "1975-07-15",
+"designation": "PET",
+"qualification": "BSC",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t1608394",
+"password": "teacher123",
+"role": "teacher",
+"name": "Shayad Khan",
+"employeeId": "1608394",
+"gender": "Male",
+"dob": "1993-02-27",
+"designation": "TGT",
+"qualification": "BSC",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t1532116",
+"password": "teacher123",
+"role": "teacher",
+"name": "Dinesh Chandra",
+"employeeId": "1532116",
+"gender": "Male",
+"dob": "1989-07-18",
+"designation": "PGT",
+"qualification": "B.Ed",
+"gradesTaught": [
+"9",
+"10",
+"11",
+"12"
+]
+},
+{
+"username": "t1497142",
+"password": "teacher123",
+"role": "teacher",
+"name": "Abhishek Kumar",
+"employeeId": "1497142",
+"gender": "Male",
+"dob": "1995-10-25",
+"designation": "PGT",
+"qualification": "M.SC",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t1423452",
+"password": "teacher123",
+"role": "teacher",
+"name": "Dileep Yadav",
+"employeeId": "1423452",
+"gender": "Male",
+"dob": "1996-07-16",
+"designation": "PGT",
+"qualification": "M.Sc.",
+"gradesTaught": [
+"10",
+"11",
+"12"
+]
+},
+{
+"username": "t1387488",
+"password": "teacher123",
+"role": "teacher",
+"name": "Ravijeet Singh",
+"employeeId": "1387488",
+"gender": "Male",
+"dob": "1993-01-10",
+"designation": "TGT",
+"qualification": "B.COM",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t1352464",
+"password": "teacher123",
+"role": "teacher",
+"name": "Greesh Chandra Mishra",
+"employeeId": "1352464",
+"gender": "Male",
+"dob": "1984-07-03",
+"designation": "TGT",
+"qualification": "B.SC",
+"gradesTaught": [
+"6",
+"7",
+"8"
+]
+},
+{
+"username": "t309216",
+"password": "teacher123",
+"role": "teacher",
+"name": "Paramveer Chauhan",
+"employeeId": "309216",
+"gender": "Male",
+"dob": "1998-05-17",
+"designation": "TGT",
+"qualification": "M.SC",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t309209",
+"password": "teacher123",
+"role": "teacher",
+"name": "Ompal",
+"employeeId": "309209",
+"gender": "Male",
+"dob": "1985-09-20",
+"designation": "PET",
+"qualification": "M.A.",
+"gradesTaught": [
+"11",
+"12"
+]
+},
+{
+"username": "t309207",
+"password": "teacher123",
+"role": "teacher",
+"name": "Sanjeev Kumar",
+"employeeId": "309207",
+"gender": "Male",
+"dob": "1974-09-01",
+"designation": "TGT",
+"qualification": "M.A",
+"gradesTaught": [
+"6",
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t309206",
+"password": "teacher123",
+"role": "teacher",
+"name": "Sandhya Yadav",
+"employeeId": "309206",
+"gender": "Female",
+"dob": "1980-04-03",
+"designation": "PRT",
+"qualification": "B.A.",
+"gradesTaught": []
+},
+{
+"username": "t309200",
+"password": "teacher123",
+"role": "teacher",
+"name": "Bhagvan Das",
+"employeeId": "309200",
+"gender": "Male",
+"dob": "1990-05-14",
+"designation": "TGT",
+"qualification": "B.SC.",
+"gradesTaught": [
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t309199",
+"password": "teacher123",
+"role": "teacher",
+"name": "Pramod Kumar",
+"employeeId": "309199",
+"gender": "Male",
+"dob": "1973-07-02",
+"designation": "TGT",
+"qualification": "M.A",
+"gradesTaught": [
+"7",
+"8",
+"9",
+"10"
+]
+},
+{
+"username": "t309196",
+"password": "teacher123",
+"role": "teacher",
+"name": "Vijay Kumar Baghel",
+"employeeId": "309196",
+"gender": "Male",
+"dob": "1967-09-04",
+"designation": "PRINCIPAL",
+"qualification": "M.SC.",
+"gradesTaught": []
+}
+]

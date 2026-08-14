@@ -76,10 +76,10 @@ function start(port, triesLeft = 10) {
   const server = app.listen(port, () => {
     console.log(`\n  Dhumari Public School ERP running`);
     console.log(`  Open  http://localhost:${port}\n`);
-    console.log(`  Logins:`);
-    console.log(`    Student     ->  priya / priya123`);
-    console.log(`    Teacher     ->  verma / verma123`);
-    console.log(`    Accountant  ->  nair  / nair123\n`);
+    console.log(`  Demo logins:`);
+    console.log(`    Student     ->  nursery-a-1 / student123`);
+    console.log(`    Teacher     ->  t3201744    / teacher123`);
+    console.log(`    Accountant  ->  nair        / nair123\n`);
     console.log(`  Press Ctrl+C to stop.\n`);
   });
 
