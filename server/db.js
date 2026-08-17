@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import { UPLOADS_DIR } from "./files.js";
 import {
-  users, teaching, marks, attendance, assignments, fees, notices
+  users, teaching, marks, attendance, assignments, fees, notices, classes, settings
 } from "../seed/data.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -113,6 +113,20 @@ db.exec(`
     FOREIGN KEY (student_id)  REFERENCES users(id),
     FOREIGN KEY (uploaded_by) REFERENCES users(id)
   );
+
+  -- classes the school runs — source of truth for "which classes exist".
+  CREATE TABLE IF NOT EXISTS classes (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    name             TEXT UNIQUE NOT NULL,
+    class_teacher_id INTEGER,
+    FOREIGN KEY (class_teacher_id) REFERENCES users(id)
+  );
+
+  -- school profile, managed by admin
+  CREATE TABLE IF NOT EXISTS settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
 
 // --- migrations for databases created before file-upload support ---
@@ -126,6 +140,13 @@ addColumn("submissions", "file_name", "TEXT");
 addColumn("submissions", "original_name", "TEXT");
 addColumn("submissions", "uploaded_at", "TEXT");
 
+// --- migrations for the admin role's profile fields (student + staff) ---
+for (const [col, defn] of [
+  ["admission_no", "TEXT"], ["gender", "TEXT"], ["dob", "TEXT"],
+  ["guardian_name", "TEXT"], ["phone", "TEXT"], ["email", "TEXT"], ["address", "TEXT"],
+  ["employee_id", "TEXT"], ["designation", "TEXT"], ["joining_date", "TEXT"]
+]) addColumn("users", col, defn);
+
 // ------------------------------------------------------------------ seeding
 function isEmpty() {
   const row = db.get("SELECT COUNT(*) AS c FROM users");
@@ -135,13 +156,25 @@ function isEmpty() {
 function seed() {
   const idOf = {}; // username -> id
 
+  // The real roster shares a handful of default passwords (student123 /
+  // teacher123 / …). Hashing each of ~1400 users separately would take over a
+  // minute on boot, so cache the hash per distinct password string.
+  const hashCache = {};
+  const hashFor = (p) => (hashCache[p] ||= bcrypt.hashSync(p, 10));
+
   db.run("BEGIN");
   try {
     for (const u of users) {
-      const hash = bcrypt.hashSync(u.password, 10);
+      const hash = hashFor(u.password);
       db.run(
-        "INSERT INTO users (username, password_hash, role, name, class_name, roll) VALUES (?,?,?,?,?,?)",
-        [u.username, hash, u.role, u.name, u.className || null, u.roll ?? null]
+        `INSERT INTO users (username, password_hash, role, name, class_name, roll,
+           admission_no, gender, dob, guardian_name, phone, email, address,
+           employee_id, designation, joining_date)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [u.username, hash, u.role, u.name, u.className || null, u.roll ?? null,
+         u.admissionNo || null, u.gender || null, u.dob || null, u.guardianName || null,
+         u.phone || null, u.email || null, u.address || null,
+         u.employeeId || null, u.designation || null, u.joiningDate || null]
       );
       idOf[u.username] = db.get("SELECT id FROM users WHERE username=?", [u.username]).id;
     }
@@ -149,6 +182,15 @@ function seed() {
     for (const t of teaching) {
       db.run("INSERT INTO teaching (teacher_id, class_name, subject) VALUES (?,?,?)",
         [idOf[t.teacher], t.className, t.subject]);
+    }
+
+    for (const c of (classes || [])) {
+      db.run("INSERT INTO classes (name, class_teacher_id) VALUES (?,?)",
+        [c.name, c.classTeacher ? idOf[c.classTeacher] : null]);
+    }
+
+    for (const [key, value] of Object.entries(settings || {})) {
+      db.run("INSERT INTO settings (key, value) VALUES (?,?)", [key, value]);
     }
 
     for (const [uname, subject, exam, score, max] of marks) {
@@ -190,7 +232,8 @@ if (process.argv.includes("--reseed")) {
   db.exec(`
     DELETE FROM documents;   DELETE FROM notices;       DELETE FROM submissions;
     DELETE FROM assignments; DELETE FROM fees;          DELETE FROM attendance;
-    DELETE FROM marks;       DELETE FROM teaching;      DELETE FROM users;
+    DELETE FROM marks;       DELETE FROM teaching;      DELETE FROM classes;
+    DELETE FROM settings;    DELETE FROM users;
   `);
   // wipe uploaded PDFs so a reset really is a clean slate
   try {
@@ -384,6 +427,13 @@ export function getDocumentById(id) {
 export function allStudents() {
   return db.all("SELECT id, name, class_name, roll FROM users WHERE role='student' ORDER BY class_name, roll");
 }
+// Fuller roster for the accountant's Students table (no sensitive fields).
+export function studentsRoster() {
+  return db.all(`
+    SELECT id, name, class_name, roll, admission_no, gender, guardian_name, phone
+    FROM users WHERE role='student'
+    ORDER BY class_name, roll`);
+}
 export function addFee(studentId, title, amount, period) {
   db.run("INSERT INTO fees (student_id, title, amount, period, status) VALUES (?,?,?,?, 'due')",
     [studentId, title, amount, period]);
@@ -427,6 +477,183 @@ export function getNoticeById(id) {
 }
 export function deleteNotice(id) {
   db.run("DELETE FROM notices WHERE id=?", [id]);
+}
+
+// ---- admin: dashboard ----
+export function adminOverview() {
+  const totalStudents = db.get("SELECT COUNT(*) AS c FROM users WHERE role='student'").c;
+  const totalStaff = db.get("SELECT COUNT(*) AS c FROM users WHERE role IN ('teacher','accountant')").c;
+  const totalClasses = db.get("SELECT COUNT(*) AS c FROM classes").c;
+  const feeRows = db.all("SELECT amount, status FROM fees");
+  const feesDue = feeRows.filter(f => f.status === "due").reduce((s, f) => s + f.amount, 0);
+  const feesPaid = feeRows.filter(f => f.status === "paid").reduce((s, f) => s + f.amount, 0);
+  const today = new Date().toISOString().slice(0, 10);
+  const attRows = db.all("SELECT present, COUNT(*) AS c FROM attendance WHERE date=? GROUP BY present", [today]);
+  const present = attRows.find(r => r.present === 1)?.c || 0;
+  const absent = attRows.find(r => r.present === 0)?.c || 0;
+  return { totalStudents, totalStaff, totalClasses, feesDue, feesPaid, today, present, absent };
+}
+
+// ---- admin: students ----
+export function allStudentsDetailed() {
+  return db.all(`
+    SELECT id, username, name, class_name, roll, admission_no, gender, dob,
+           guardian_name, phone, email, address
+    FROM users WHERE role='student' ORDER BY class_name, roll`);
+}
+export function createStudent(u) {
+  db.run(`
+    INSERT INTO users (username, password_hash, role, name, class_name, roll,
+      admission_no, gender, dob, guardian_name, phone, email, address)
+    VALUES (?,?,'student',?,?,?,?,?,?,?,?,?,?)`,
+    [u.username, u.passwordHash, u.name, u.className, u.roll ?? null,
+     u.admissionNo || null, u.gender || null, u.dob || null, u.guardianName || null,
+     u.phone || null, u.email || null, u.address || null]);
+  return db.get("SELECT id FROM users WHERE username=?", [u.username]).id;
+}
+export function updateStudent(id, u) {
+  db.run(`
+    UPDATE users SET name=?, class_name=?, roll=?, admission_no=?, gender=?, dob=?,
+      guardian_name=?, phone=?, email=?, address=?
+    WHERE id=? AND role='student'`,
+    [u.name, u.className, u.roll ?? null, u.admissionNo || null, u.gender || null, u.dob || null,
+     u.guardianName || null, u.phone || null, u.email || null, u.address || null, id]);
+}
+export function deleteStudent(id) {
+  db.run("BEGIN");
+  try {
+    db.run("DELETE FROM marks WHERE student_id=?", [id]);
+    db.run("DELETE FROM attendance WHERE student_id=?", [id]);
+    db.run("DELETE FROM submissions WHERE student_id=?", [id]);
+    db.run("DELETE FROM fees WHERE student_id=?", [id]);
+    db.run("DELETE FROM documents WHERE student_id=?", [id]);
+    db.run("DELETE FROM users WHERE id=? AND role='student'", [id]);
+    db.run("COMMIT");
+  } catch (e) {
+    db.run("ROLLBACK");
+    throw e;
+  }
+}
+
+// ---- admin: staff (teachers + accountant) ----
+export function allStaff() {
+  return db.all(`
+    SELECT id, username, name, role, employee_id, designation, phone, email, joining_date
+    FROM users WHERE role IN ('teacher','accountant') ORDER BY role, name`);
+}
+export function createStaff(u) {
+  db.run(`
+    INSERT INTO users (username, password_hash, role, name, employee_id, designation, phone, email, joining_date)
+    VALUES (?,?,?,?,?,?,?,?,?)`,
+    [u.username, u.passwordHash, u.role, u.name, u.employeeId || null, u.designation || null,
+     u.phone || null, u.email || null, u.joiningDate || null]);
+  return db.get("SELECT id FROM users WHERE username=?", [u.username]).id;
+}
+export function updateStaff(id, u) {
+  db.run(`
+    UPDATE users SET name=?, employee_id=?, designation=?, phone=?, email=?, joining_date=?
+    WHERE id=? AND role IN ('teacher','accountant')`,
+    [u.name, u.employeeId || null, u.designation || null, u.phone || null, u.email || null,
+     u.joiningDate || null, id]);
+}
+// Throws if the staff member is still referenced by their own historical
+// records (assignments/notices/documents) — the FK constraint rejects it.
+export function deleteStaff(id) {
+  db.run("DELETE FROM teaching WHERE teacher_id=?", [id]);
+  db.run("DELETE FROM users WHERE id=? AND role IN ('teacher','accountant')", [id]);
+}
+
+// ---- admin: teaching assignments (which class+subject a teacher teaches) ----
+export function teachingForTeacher(teacherId) {
+  return db.all("SELECT id, class_name, subject FROM teaching WHERE teacher_id=? ORDER BY class_name, subject",
+    [teacherId]);
+}
+export function addTeaching(teacherId, className, subject) {
+  const existing = db.get("SELECT id FROM teaching WHERE teacher_id=? AND class_name=? AND subject=?",
+    [teacherId, className, subject]);
+  if (!existing)
+    db.run("INSERT INTO teaching (teacher_id, class_name, subject) VALUES (?,?,?)", [teacherId, className, subject]);
+}
+export function removeTeaching(id) {
+  db.run("DELETE FROM teaching WHERE id=?", [id]);
+}
+
+// ---- admin: classes ----
+export function allClassesWithCounts() {
+  return db.all(`
+    SELECT c.id, c.name, c.class_teacher_id, u.name AS class_teacher_name,
+      (SELECT COUNT(*) FROM users s WHERE s.role='student' AND s.class_name=c.name) AS student_count
+    FROM classes c LEFT JOIN users u ON u.id=c.class_teacher_id
+    ORDER BY c.name`);
+}
+export function classById(id) {
+  return db.get("SELECT * FROM classes WHERE id=?", [id]) || null;
+}
+export function createClass(name, classTeacherId) {
+  db.run("INSERT INTO classes (name, class_teacher_id) VALUES (?,?)", [name, classTeacherId || null]);
+  return db.get("SELECT id FROM classes WHERE name=?", [name]).id;
+}
+// Renaming cascades class_name across every table that stores it as free text.
+export function updateClass(id, name, classTeacherId) {
+  const cls = classById(id);
+  if (!cls) return;
+  db.run("BEGIN");
+  try {
+    if (name && name !== cls.name) {
+      db.run("UPDATE users SET class_name=? WHERE class_name=?", [name, cls.name]);
+      db.run("UPDATE teaching SET class_name=? WHERE class_name=?", [name, cls.name]);
+      db.run("UPDATE assignments SET class_name=? WHERE class_name=?", [name, cls.name]);
+    }
+    db.run("UPDATE classes SET name=?, class_teacher_id=? WHERE id=?",
+      [name || cls.name, classTeacherId ?? cls.class_teacher_id, id]);
+    db.run("COMMIT");
+  } catch (e) {
+    db.run("ROLLBACK");
+    throw e;
+  }
+}
+export function deleteClass(id) {
+  db.run("DELETE FROM classes WHERE id=?", [id]);
+}
+
+// ---- admin: examinations ----
+export function distinctExams() {
+  return db.all(`
+    SELECT DISTINCT u.class_name, m.exam
+    FROM marks m JOIN users u ON u.id=m.student_id
+    WHERE u.role='student'
+    ORDER BY u.class_name, m.exam`);
+}
+export function examResults(className, exam) {
+  return db.all(`
+    SELECT u.id, u.name, u.roll, SUM(m.score) AS total, SUM(m.max_score) AS max_total
+    FROM users u JOIN marks m ON m.student_id=u.id AND m.exam=?
+    WHERE u.role='student' AND u.class_name=?
+    GROUP BY u.id ORDER BY u.roll`, [exam, className]);
+}
+
+// ---- admin: attendance overview (read-only) ----
+export function attendanceOverview(className, date) {
+  return db.all(`
+    SELECT u.id, u.name, u.roll, a.present
+    FROM users u LEFT JOIN attendance a ON a.student_id=u.id AND a.date=?
+    WHERE u.role='student' AND u.class_name=?
+    ORDER BY u.roll`, [date, className]);
+}
+
+// ---- admin: settings ----
+export function getSettings() {
+  const rows = db.all("SELECT key, value FROM settings");
+  const obj = {};
+  for (const r of rows) obj[r.key] = r.value;
+  return obj;
+}
+export function updateSettings(obj) {
+  for (const [key, value] of Object.entries(obj || {})) {
+    const existing = db.get("SELECT key FROM settings WHERE key=?", [key]);
+    if (existing) db.run("UPDATE settings SET value=? WHERE key=?", [value, key]);
+    else db.run("INSERT INTO settings (key, value) VALUES (?,?)", [key, value]);
+  }
 }
 
 export default db;

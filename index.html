@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPS Dhumari — School ERP</title>
+<style>
+  :root{
+    /* Palette pulled from the Dhumari Public School crest: crimson + gold. */
+    --primary:#b0182b; --primary-light:#c11d31; --primary-dark:#8c111f;
+    --accent:#c69214; --accent-light:#e6c260;
+    --bg:#f5f1ec; --card:#ffffff; --text:#26161a; --muted:#7a6a6e;
+    --border:#ece2dd; --green:#2e9e6b; --red:#c8483a; --amber:#d97706;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  /* Splash / loading screen (premium) */
+  @keyframes splashFade{to{opacity:0;visibility:hidden}}
+  @keyframes crestPop{0%{opacity:0;transform:scale(.6) translateY(12px)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  @keyframes barFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes floatUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes ringSpin{to{transform:rotate(360deg)}}
+  @keyframes haloGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+  @keyframes nameSheen{to{background-position:200% 0}}
+  @keyframes dotPulse{0%,100%{opacity:.3}50%{opacity:1}}
+  .splash{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+    background:radial-gradient(120% 90% at 50% -10%, #c11d31 0%, #9a1322 42%, #6a0d16 100%);
+    animation:splashFade .6s ease 2.3s forwards}
+  .splash::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(70% 60% at 50% 45%, transparent 40%, rgba(0,0,0,.35) 100%)}
+  .splash::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(38% 30% at 50% 40%, rgba(230,194,96,.30), transparent 70%)}
+  .splash-inner{position:relative;text-align:center;color:#fff}
+  .splash-badge-wrap{position:relative;width:150px;height:150px;margin:0 auto;display:grid;place-items:center}
+  .splash-ring{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(230,194,96,0) 0deg, rgba(230,194,96,.15) 60deg, #f0d27a 150deg, #c69214 200deg, rgba(230,194,96,.15) 300deg, rgba(230,194,96,0) 360deg);
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    animation:ringSpin 3s linear infinite, haloGlow 2.4s ease-in-out infinite}
+  .splash-badge{position:relative;width:110px;height:110px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 38%, #e6c260, #c69214 70%);
+    color:#7a0f16;font-weight:800;font-size:1.9rem;letter-spacing:.06em;font-family:'Segoe UI',sans-serif;
+    box-shadow:0 18px 50px rgba(0,0,0,.45), 0 0 0 5px rgba(255,255,255,.14), 0 0 40px rgba(230,194,96,.35), inset 0 0 0 4px rgba(122,15,22,.25);
+    animation:crestPop .9s cubic-bezier(.2,.85,.25,1) both}
+  .splash-name{font-weight:700;font-size:1.6rem;margin-top:26px;
+    background:linear-gradient(100deg,#fff 0%,#fff 35%,#ffe6a8 50%,#fff 65%,#fff 100%);
+    background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    animation:floatUp .6s ease .35s both, nameSheen 3.2s ease-in-out .9s infinite}
+  .splash-orn{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;color:#e6c260;animation:floatUp .6s ease .5s both}
+  .splash-orn i{display:block;width:44px;height:1.5px;background:linear-gradient(90deg,transparent,#e6c260)}
+  .splash-orn i:last-child{background:linear-gradient(90deg,#e6c260,transparent)}
+  .splash-orn b{width:7px;height:7px;background:#e6c260;transform:rotate(45deg);box-shadow:0 0 10px rgba(230,194,96,.7)}
+  .splash-sub{font-size:.72rem;opacity:.9;margin-top:12px;letter-spacing:.28em;text-transform:uppercase;color:#f6e6c4;animation:floatUp .6s ease .62s both}
+  .splash-bar{width:160px;height:3px;border-radius:4px;background:rgba(255,255,255,.18);margin:26px auto 0;overflow:hidden}
+  .splash-bar>span{display:block;height:100%;border-radius:4px;transform-origin:left;
+    background:linear-gradient(90deg,#f0d27a,#c69214);animation:barFill 1.9s ease .15s both}
+  .splash-dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+  .splash-dots span{width:6px;height:6px;border-radius:50%;background:#e6c260;animation:dotPulse 1.2s ease-in-out infinite}
+  .splash-dots span:nth-child(2){animation-delay:.2s}
+  .splash-dots span:nth-child(3){animation-delay:.4s}
+  /* Sidebar */
+  .sidebar{width:230px;background:linear-gradient(180deg,#b0182b,#8c111f 60%,#7a0f16);color:#fff;display:flex;flex-direction:column;position:fixed;height:100vh;overflow-y:auto;box-shadow:2px 0 18px rgba(122,15,22,.18)}
+  .brand{padding:20px 18px;font-weight:700;font-size:1.05rem;line-height:1.3;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:11px}
+  .brand-badge{width:34px;height:34px;flex:none;border-radius:9px;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 38%, #e6c260, #c69214 75%);color:#7a0f16;font-weight:800;font-size:.82rem;letter-spacing:.02em;box-shadow:inset 0 0 0 2px rgba(122,15,22,.25)}
+  .brand small{display:block;font-weight:400;font-size:.72rem;opacity:.8;margin-top:3px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:.92rem;opacity:.85;border-left:3px solid transparent;transition:background .16s,opacity .16s,border-color .16s}
+  .nav a:hover{background:rgba(255,255,255,.08);opacity:1}
+  .nav a.active{background:rgba(255,255,255,.14);border-left-color:var(--accent-light);opacity:1;font-weight:600}
+  .nav .ic{width:20px;text-align:center}
+  /* Main */
+  .main{margin-left:230px;flex:1;padding:24px 28px;width:calc(100% - 230px)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+  .topbar h1{font-size:1.4rem;color:var(--primary);position:relative;padding-bottom:10px}
+  .topbar h1::after{content:"";position:absolute;left:0;bottom:0;width:52px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+  .btn{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border:none;padding:9px 16px;border-radius:7px;font-size:.88rem;cursor:pointer;font-weight:500;box-shadow:0 5px 14px rgba(176,24,43,.26);transition:transform .15s,box-shadow .15s,background .15s}
+  .btn:hover{background:linear-gradient(135deg,var(--primary-light),#7a0f1b);transform:translateY(-1px);box-shadow:0 8px 20px rgba(176,24,43,.34)}
+  .btn.sec{background:#fff;color:var(--primary);border:1px solid var(--border);box-shadow:none}
+  .btn.sec:hover{background:#faf2f3;border-color:var(--primary)}
+  .btn.danger{background:linear-gradient(135deg,#d6533f,#b23324)}
+  .btn.sm{padding:5px 10px;font-size:.78rem}
+  /* Cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+  .stat{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(60,20,25,.06),0 8px 22px rgba(60,20,25,.05);border:1px solid var(--border);position:relative;overflow:hidden;animation:floatUp .5s ease both;transition:transform .18s,box-shadow .18s}
+  .stat::before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+  .stat:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(60,20,25,.06),0 16px 36px rgba(176,24,43,.12)}
+  .stat .label{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+  .stat .value{font-size:1.9rem;font-weight:700;margin-top:6px;background:linear-gradient(120deg,var(--primary-dark),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .stat .sub{font-size:.78rem;color:var(--muted);margin-top:4px}
+  .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(60,20,25,.06),0 8px 22px rgba(60,20,25,.05);margin-bottom:20px;border:1px solid var(--border);animation:floatUp .5s ease both}
+  .card h3{margin-bottom:14px;font-size:1.05rem;color:var(--primary)}
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border)}
+  th{background:#f8fafc;color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.4px}
+  tr:hover td{background:#f8fafc}
+  .tag{padding:3px 9px;border-radius:20px;font-size:.74rem;font-weight:600}
+  .tag.green{background:#dcfce7;color:var(--green)}
+  .tag.red{background:#fee2e2;color:var(--red)}
+  .tag.amber{background:#fef3c7;color:var(--amber)}
+  /* Form */
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  input,select{padding:9px 11px;border:1px solid var(--border);border-radius:7px;font-size:.88rem;font-family:inherit;background:#fff}
+  input:focus,select:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .search{flex:1;min-width:180px}
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .overlay.show{display:flex}
+  .modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+  .modal h3{color:var(--primary);margin-bottom:16px}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:5px;font-weight:500}
+  .field input,.field select{width:100%}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hide{display:none!important}
+  @media(max-width:720px){.sidebar{width:60px}.brand small,.brand-badge,.nav a span.txt{display:none}.main{margin-left:60px;width:calc(100% - 60px);padding:16px}.row2{grid-template-columns:1fr}}
+  @media(prefers-reduced-motion:reduce){.splash{animation:splashFade .4s ease .4s forwards}.splash-badge,.splash-name,.splash-sub,.splash-bar>span,.stat,.card{animation:none}}
+</style>
+</head>
+<body>
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-badge-wrap">
+        <span class="splash-ring"></span>
+        <div class="splash-badge">DPS</div>
+      </div>
+      <div class="splash-name">Dhumari Public School</div>
+      <div class="splash-orn"><i></i><b></b><i></i></div>
+      <div class="splash-sub">Etah · Estd. 2002</div>
+      <div class="splash-bar"><span></span></div>
+      <div class="splash-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-badge">DPS</span><span>Dhumari Public School<small>School ERP</small></span></div>
+    <nav class="nav" id="nav">
+      <a data-view="dashboard" class="active"><span class="ic">◱</span><span class="txt">Dashboard</span></a>
+      <a data-view="students"><span class="ic">🎓</span><span class="txt">Students</span></a>
+      <a data-view="staff"><span class="ic">👤</span><span class="txt">Staff</span></a>
+      <a data-view="classes"><span class="ic">🏫</span><span class="txt">Classes</span></a>
+      <a data-view="attendance"><span class="ic">✓</span><span class="txt">Attendance</span></a>
+      <a data-view="fees"><span class="ic">₹</span><span class="txt">Fees</span></a>
+      <a data-view="exams"><span class="ic">📝</span><span class="txt">Exams</span></a>
+      <a data-view="settings"><span class="ic">⚙</span><span class="txt">Settings</span></a>
+    </nav>
+  </aside>
+
+  <main class="main" id="main"></main>
+
+  <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+
+<script>
+/* ============ DATA LAYER ============ */
+const KEY='dps_dhumari_erp';
+const defaultData=()=>({
+  profile:{name:'Delhi Public School, Dhumari',address:'Dhumari',session:'2025-26'},
+  students:[], staff:[], classes:[
+    {id:id(),name:'Nursery',section:'A',teacher:''},
+    {id:id(),name:'Class I',section:'A',teacher:''},
+    {id:id(),name:'Class V',section:'A',teacher:''},
+    {id:id(),name:'Class X',section:'A',teacher:''},
+  ],
+  attendance:{}, fees:[], exams:[]
+});
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+let DB=load();
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return d||seed()}catch(e){return seed()}}
+function seed(){const d=defaultData();
+  d.students=[
+    {id:id(),adm:'A1001',name:'Aarav Sharma',cls:'Class V',sec:'A',roll:'1',gender:'M',dob:'2014-05-12',guardian:'Rakesh Sharma',phone:'9876500001',address:'Dhumari'},
+    {id:id(),adm:'A1002',name:'Diya Verma',cls:'Class V',sec:'A',roll:'2',gender:'F',dob:'2014-08-03',guardian:'Sunil Verma',phone:'9876500002',address:'Dhumari'},
+    {id:id(),adm:'A1003',name:'Kabir Singh',cls:'Class X',sec:'A',roll:'1',gender:'M',dob:'2009-02-20',guardian:'Manoj Singh',phone:'9876500003',address:'Dhumari'},
+  ];
+  d.staff=[
+    {id:id(),eid:'T01',name:'Meena Gupta',designation:'Class Teacher',subject:'Mathematics',phone:'9811100001',email:'meena@dps.edu',joined:'2020-04-01'},
+    {id:id(),eid:'T02',name:'Rohit Nair',designation:'Teacher',subject:'Science',phone:'9811100002',email:'rohit@dps.edu',joined:'2021-06-15'},
+  ];
+  save(d);return d;
+}
+function save(d){DB=d||DB;localStorage.setItem(KEY,JSON.stringify(DB))}
+
+/* ============ HELPERS ============ */
+const $=(s,el=document)=>el.querySelector(s);
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const overlay=$('#overlay'), modal=$('#modal');
+function openModal(html){modal.innerHTML=html;overlay.classList.add('show')}
+function closeModal(){overlay.classList.remove('show')}
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal()});
+function today(){return new Date().toISOString().slice(0,10)}
+
+/* ============ ROUTER ============ */
+const views={dashboard,students,staff,classes,attendance,fees,exams,settings};
+let current='dashboard';
+$('#nav').addEventListener('click',e=>{
+  const a=e.target.closest('a');if(!a)return;
+  document.querySelectorAll('#nav a').forEach(x=>x.classList.remove('active'));
+  a.classList.add('active');current=a.dataset.view;render();
+});
+function render(){views[current]()}
+
+/* ============ DASHBOARD ============ */
+function dashboard(){
+  const feesPaid=DB.fees.reduce((s,f)=>s+Number(f.amount||0),0);
+  const att=DB.attendance[today()]||{};
+  let present=0,absent=0;Object.values(att).forEach(v=>v==='P'?present++:absent++);
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Dashboard</h1><span style="color:var(--muted);font-size:.85rem">${DB.profile.session} • ${today()}</span></div>
+   <div class="grid">
+     <div class="stat"><div class="label">Students</div><div class="value">${DB.students.length}</div></div>
+     <div class="stat"><div class="label">Staff</div><div class="value">${DB.staff.length}</div></div>
+     <div class="stat"><div class="label">Classes</div><div class="value">${DB.classes.length}</div></div>
+     <div class="stat"><div class="label">Fees Collected</div><div class="value" style="font-size:1.4rem">${money(feesPaid)}</div><div class="sub">${DB.fees.length} payments</div></div>
+     <div class="stat"><div class="label">Present Today</div><div class="value" style="color:var(--green)">${present}</div><div class="sub">${absent} absent</div></div>
+   </div>
+   <div class="card"><h3>Welcome to ${esc(DB.profile.name)}</h3>
+     <p style="color:var(--muted);font-size:.9rem;line-height:1.6">Use the menu on the left to manage students, staff, classes, daily attendance, fees, and examinations. All data is saved automatically on this device. Remember to back up regularly from <b>Settings → Export</b>.</p>
+   </div>`;
+}
+
+/* ============ STUDENTS ============ */
+function students(){
+  const clsOpts=DB.classes.map(c=>`<option>${esc(c.name)}</option>`).join('');
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Students</h1><button class="btn" onclick="editStudent()">+ Add Student</button></div>
+   <div class="card">
+     <div class="toolbar">
+       <input class="search" id="ss" placeholder="Search name or admission no." oninput="students()" value="${_s('ss')}">
+       <select id="sf" onchange="students()"><option value="">All classes</option>${clsOpts}</select>
+     </div>
+     <div id="stbl"></div>
+   </div>`;
+  restore('sf');
+  const q=_s('ss').toLowerCase(),f=_s('sf');
+  const rows=DB.students.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.adm.toLowerCase().includes(q))&&(!f||s.cls===f));
+  $('#stbl').innerHTML=rows.length?`<table><thead><tr><th>Adm No</th><th>Name</th><th>Class</th><th>Roll</th><th>Guardian</th><th>Phone</th><th></th></tr></thead><tbody>${rows.map(s=>`
+    <tr><td>${esc(s.adm)}</td><td>${esc(s.name)}</td><td>${esc(s.cls)}-${esc(s.sec)}</td><td>${esc(s.roll)}</td><td>${esc(s.guardian)}</td><td>${esc(s.phone)}</td>
+    <td style="white-space:nowrap"><button class="btn sec sm" onclick="editStudent('${s.id}')">Edit</button> <button class="btn danger sm" onclick="delItem('students','${s.id}')">Del</button></td></tr>`).join('')}</tbody></table>`
+    :`<div class="empty">No students found.</div>`;
+}
+function editStudent(sid){
+  const s=DB.students.find(x=>x.id===sid)||{};
+  const clsOpts=DB.classes.map(c=>`<option ${s.cls===c.name?'selected':''}>${esc(c.name)}</option>`).join('');
+  openModal(`<h3>${sid?'Edit':'Add'} Student</h3>
+    <div class="row2"><div class="field"><label>Admission No.</label><input id="f_adm" value="${esc(s.adm)}"></div>
+      <div class="field"><label>Roll No.</label><input id="f_roll" value="${esc(s.roll)}"></div></div>
+    <div class="field"><label>Full Name</label><input id="f_name" value="${esc(s.name)}"></div>
+    <div class="row2"><div class="field"><label>Class</label><select id="f_cls">${clsOpts}</select></div>
+      <div class="field"><label>Section</label><input id="f_sec" value="${esc(s.sec||'A')}"></div></div>
+    <div class="row2"><div class="field"><label>Gender</label><select id="f_gender"><option ${s.gender==='M'?'selected':''}>M</option><option ${s.gender==='F'?'selected':''}>F</option></select></div>
+      <div class="field"><label>Date of Birth</label><input type="date" id="f_dob" value="${esc(s.dob)}"></div></div>
+    <div class="field"><label>Guardian Name</label><input id="f_guardian" value="${esc(s.guardian)}"></div>
+    <div class="row2"><div class="field"><label>Phone</label><input id="f_phone" value="${esc(s.phone)}"></div>
+      <div class="field"><label>Address</label><input id="f_address" value="${esc(s.address)}"></div></div>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveStudent('${sid||''}')">Save</button></div>`);
+}
+function saveStudent(sid){
+  const g=f=>$('#f_'+f).value.trim();
+  if(!g('name')){alert('Name is required');return}
+  const obj={id:sid||id(),adm:g('adm'),name:g('name'),cls:g('cls'),sec:g('sec'),roll:g('roll'),gender:g('gender'),dob:g('dob'),guardian:g('guardian'),phone:g('phone'),address:g('address')};
+  if(sid){const i=DB.students.findIndex(x=>x.id===sid);DB.students[i]=obj}else DB.students.push(obj);
+  save();closeModal();students();
+}
+
+/* ============ STAFF ============ */
+function staff(){
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Staff</h1><button class="btn" onclick="editStaff()">+ Add Staff</button></div>
+   <div class="card"><div class="toolbar"><input class="search" id="ts" placeholder="Search name or designation" oninput="staff()" value="${_s('ts')}"></div><div id="ttbl"></div></div>`;
+  const q=_s('ts').toLowerCase();
+  const rows=DB.staff.filter(s=>!q||s.name.toLowerCase().includes(q)||(s.designation||'').toLowerCase().includes(q));
+  $('#ttbl').innerHTML=rows.length?`<table><thead><tr><th>Emp ID</th><th>Name</th><th>Designation</th><th>Subject</th><th>Phone</th><th>Email</th><th></th></tr></thead><tbody>${rows.map(s=>`
+    <tr><td>${esc(s.eid)}</td><td>${esc(s.name)}</td><td>${esc(s.designation)}</td><td>${esc(s.subject)}</td><td>${esc(s.phone)}</td><td>${esc(s.email)}</td>
+    <td style="white-space:nowrap"><button class="btn sec sm" onclick="editStaff('${s.id}')">Edit</button> <button class="btn danger sm" onclick="delItem('staff','${s.id}')">Del</button></td></tr>`).join('')}</tbody></table>`
+    :`<div class="empty">No staff found.</div>`;
+}
+function editStaff(sid){
+  const s=DB.staff.find(x=>x.id===sid)||{};
+  openModal(`<h3>${sid?'Edit':'Add'} Staff</h3>
+    <div class="row2"><div class="field"><label>Employee ID</label><input id="f_eid" value="${esc(s.eid)}"></div>
+      <div class="field"><label>Joining Date</label><input type="date" id="f_joined" value="${esc(s.joined)}"></div></div>
+    <div class="field"><label>Full Name</label><input id="f_name" value="${esc(s.name)}"></div>
+    <div class="row2"><div class="field"><label>Designation</label><input id="f_designation" value="${esc(s.designation)}"></div>
+      <div class="field"><label>Subject</label><input id="f_subject" value="${esc(s.subject)}"></div></div>
+    <div class="row2"><div class="field"><label>Phone</label><input id="f_phone" value="${esc(s.phone)}"></div>
+      <div class="field"><label>Email</label><input id="f_email" value="${esc(s.email)}"></div></div>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveStaff('${sid||''}')">Save</button></div>`);
+}
+function saveStaff(sid){
+  const g=f=>$('#f_'+f).value.trim();
+  if(!g('name')){alert('Name is required');return}
+  const obj={id:sid||id(),eid:g('eid'),name:g('name'),designation:g('designation'),subject:g('subject'),phone:g('phone'),email:g('email'),joined:g('joined')};
+  if(sid){const i=DB.staff.findIndex(x=>x.id===sid);DB.staff[i]=obj}else DB.staff.push(obj);
+  save();closeModal();staff();
+}
+
+/* ============ CLASSES ============ */
+function classes(){
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Classes & Sections</h1><button class="btn" onclick="editClass()">+ Add Class</button></div>
+   <div class="card"><div id="ctbl"></div></div>`;
+  const rows=DB.classes;
+  $('#ctbl').innerHTML=rows.length?`<table><thead><tr><th>Class</th><th>Section</th><th>Class Teacher</th><th>Students</th><th></th></tr></thead><tbody>${rows.map(c=>{
+    const cnt=DB.students.filter(s=>s.cls===c.name&&s.sec===c.section).length;
+    return `<tr><td>${esc(c.name)}</td><td>${esc(c.section)}</td><td>${esc(c.teacher)||'<span style="color:var(--muted)">—</span>'}</td><td>${cnt}</td>
+    <td style="white-space:nowrap"><button class="btn sec sm" onclick="editClass('${c.id}')">Edit</button> <button class="btn danger sm" onclick="delItem('classes','${c.id}')">Del</button></td></tr>`}).join('')}</tbody></table>`
+    :`<div class="empty">No classes yet.</div>`;
+}
+function editClass(cid){
+  const c=DB.classes.find(x=>x.id===cid)||{};
+  const tOpts='<option value="">— none —</option>'+DB.staff.map(s=>`<option ${c.teacher===s.name?'selected':''}>${esc(s.name)}</option>`).join('');
+  openModal(`<h3>${cid?'Edit':'Add'} Class</h3>
+    <div class="row2"><div class="field"><label>Class Name</label><input id="f_name" value="${esc(c.name)}" placeholder="e.g. Class VI"></div>
+      <div class="field"><label>Section</label><input id="f_section" value="${esc(c.section||'A')}"></div></div>
+    <div class="field"><label>Class Teacher</label><select id="f_teacher">${tOpts}</select></div>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveClass('${cid||''}')">Save</button></div>`);
+}
+function saveClass(cid){
+  const g=f=>$('#f_'+f).value.trim();
+  if(!g('name')){alert('Class name required');return}
+  const obj={id:cid||id(),name:g('name'),section:g('section'),teacher:g('teacher')};
+  if(cid){const i=DB.classes.findIndex(x=>x.id===cid);DB.classes[i]=obj}else DB.classes.push(obj);
+  save();closeModal();classes();
+}
+
+/* ============ ATTENDANCE ============ */
+function attendance(){
+  const clsOpts=DB.classes.map(c=>`<option>${esc(c.name)}</option>`).join('');
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Attendance</h1></div>
+   <div class="card"><div class="toolbar">
+     <input type="date" id="ad" value="${_s('ad')||today()}" onchange="attendance()">
+     <select id="ac" onchange="attendance()">${clsOpts}</select>
+     <button class="btn sec sm" onclick="markAll('P')">All Present</button>
+     <button class="btn sec sm" onclick="markAll('A')">All Absent</button>
+   </div><div id="atbl"></div></div>`;
+  restore('ac');restore('ad');
+  const date=_s('ad')||today(),cls=_s('ac')||(DB.classes[0]&&DB.classes[0].name);
+  const list=DB.students.filter(s=>s.cls===cls);
+  DB.attendance[date]=DB.attendance[date]||{};
+  $('#atbl').innerHTML=list.length?`<table><thead><tr><th>Roll</th><th>Name</th><th>Status</th></tr></thead><tbody>${list.map(s=>{
+    const st=DB.attendance[date][s.id]||'P';
+    return `<tr><td>${esc(s.roll)}</td><td>${esc(s.name)}</td><td>
+      <button class="tag ${st==='P'?'green':'red'}" style="border:none;cursor:pointer" onclick="toggleAtt('${date}','${s.id}')">${st==='P'?'Present':'Absent'}</button></td></tr>`}).join('')}</tbody></table>`
+    :`<div class="empty">No students in this class.</div>`;
+}
+function toggleAtt(date,sid){
+  DB.attendance[date]=DB.attendance[date]||{};
+  DB.attendance[date][sid]=DB.attendance[date][sid]==='A'?'P':'A';
+  save();attendance();
+}
+function markAll(v){
+  const date=_s('ad')||today(),cls=_s('ac')||(DB.classes[0]&&DB.classes[0].name);
+  DB.attendance[date]=DB.attendance[date]||{};
+  DB.students.filter(s=>s.cls===cls).forEach(s=>DB.attendance[date][s.id]=v);
+  save();attendance();
+}
+
+/* ============ FEES ============ */
+function fees(){
+  const paid=DB.fees.reduce((s,f)=>s+Number(f.amount||0),0);
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Fees</h1><button class="btn" onclick="editFee()">+ Record Payment</button></div>
+   <div class="grid"><div class="stat"><div class="label">Total Collected</div><div class="value" style="font-size:1.5rem">${money(paid)}</div></div>
+     <div class="stat"><div class="label">Payments</div><div class="value">${DB.fees.length}</div></div></div>
+   <div class="card"><div id="ftbl"></div></div>`;
+  const rows=[...DB.fees].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  $('#ftbl').innerHTML=rows.length?`<table><thead><tr><th>Receipt</th><th>Date</th><th>Student</th><th>Type</th><th>Mode</th><th>Amount</th><th></th></tr></thead><tbody>${rows.map(f=>{
+    const s=DB.students.find(x=>x.id===f.student);
+    return `<tr><td>${esc(f.receipt)}</td><td>${esc(f.date)}</td><td>${esc(s?s.name:'—')}</td><td>${esc(f.type)}</td><td>${esc(f.mode)}</td><td>${money(f.amount)}</td>
+    <td><button class="btn danger sm" onclick="delItem('fees','${f.id}')">Del</button></td></tr>`}).join('')}</tbody></table>`
+    :`<div class="empty">No payments recorded.</div>`;
+}
+function editFee(){
+  const sOpts=DB.students.map(s=>`<option value="${s.id}">${esc(s.name)} (${esc(s.cls)})</option>`).join('');
+  openModal(`<h3>Record Fee Payment</h3>
+    <div class="field"><label>Student</label><select id="f_student">${sOpts}</select></div>
+    <div class="row2"><div class="field"><label>Receipt No.</label><input id="f_receipt" value="R${Date.now().toString().slice(-5)}"></div>
+      <div class="field"><label>Date</label><input type="date" id="f_date" value="${today()}"></div></div>
+    <div class="row2"><div class="field"><label>Fee Type</label><select id="f_type"><option>Tuition</option><option>Transport</option><option>Exam</option><option>Admission</option><option>Other</option></select></div>
+      <div class="field"><label>Mode</label><select id="f_mode"><option>Cash</option><option>UPI</option><option>Cheque</option><option>Card</option></select></div></div>
+    <div class="field"><label>Amount (₹)</label><input type="number" id="f_amount" placeholder="0"></div>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveFee()">Save</button></div>`);
+}
+function saveFee(){
+  const g=f=>$('#f_'+f).value.trim();
+  if(!g('student')){alert('Add a student first');return}
+  if(!g('amount')){alert('Amount required');return}
+  DB.fees.push({id:id(),student:g('student'),receipt:g('receipt'),date:g('date'),type:g('type'),mode:g('mode'),amount:g('amount')});
+  save();closeModal();fees();
+}
+
+/* ============ EXAMS ============ */
+function exams(){
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Examinations</h1><button class="btn" onclick="editExam()">+ Add Exam</button></div>
+   <div class="card"><div id="etbl"></div></div>`;
+  const rows=DB.exams;
+  $('#etbl').innerHTML=rows.length?`<table><thead><tr><th>Exam</th><th>Class</th><th>Subject</th><th>Max</th><th>Date</th><th>Marks Entered</th><th></th></tr></thead><tbody>${rows.map(e=>`
+    <tr><td>${esc(e.name)}</td><td>${esc(e.cls)}</td><td>${esc(e.subject)}</td><td>${esc(e.max)}</td><td>${esc(e.date)}</td><td>${Object.keys(e.marks||{}).length}</td>
+    <td style="white-space:nowrap"><button class="btn sec sm" onclick="enterMarks('${e.id}')">Marks</button> <button class="btn danger sm" onclick="delItem('exams','${e.id}')">Del</button></td></tr>`).join('')}</tbody></table>`
+    :`<div class="empty">No exams yet.</div>`;
+}
+function editExam(){
+  const clsOpts=DB.classes.map(c=>`<option>${esc(c.name)}</option>`).join('');
+  openModal(`<h3>Add Exam</h3>
+    <div class="field"><label>Exam Name</label><input id="f_name" placeholder="e.g. Half Yearly"></div>
+    <div class="row2"><div class="field"><label>Class</label><select id="f_cls">${clsOpts}</select></div>
+      <div class="field"><label>Subject</label><input id="f_subject" placeholder="e.g. Mathematics"></div></div>
+    <div class="row2"><div class="field"><label>Max Marks</label><input type="number" id="f_max" value="100"></div>
+      <div class="field"><label>Date</label><input type="date" id="f_date" value="${today()}"></div></div>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveExam()">Save</button></div>`);
+}
+function saveExam(){
+  const g=f=>$('#f_'+f).value.trim();
+  if(!g('name')){alert('Exam name required');return}
+  DB.exams.push({id:id(),name:g('name'),cls:g('cls'),subject:g('subject'),max:g('max')||100,date:g('date'),marks:{}});
+  save();closeModal();exams();
+}
+function enterMarks(eid){
+  const e=DB.exams.find(x=>x.id===eid);
+  const list=DB.students.filter(s=>s.cls===e.cls);
+  if(!list.length){alert('No students in '+e.cls);return}
+  openModal(`<h3>${esc(e.name)} — ${esc(e.subject)} (${esc(e.cls)})</h3>
+    <p style="color:var(--muted);font-size:.82rem;margin-bottom:12px">Max marks: ${esc(e.max)}. Pass ≥ 33%.</p>
+    <table><thead><tr><th>Name</th><th>Marks</th><th>Result</th></tr></thead><tbody>${list.map(s=>{
+      const m=e.marks[s.id]??'';const pct=m!==''?Math.round(m/e.max*100):null;
+      return `<tr><td>${esc(s.name)}</td><td><input type="number" style="width:70px" id="m_${s.id}" value="${m}" oninput="null"></td>
+      <td id="r_${s.id}">${pct===null?'—':pct>=33?`<span class="tag green">Pass ${pct}%</span>`:`<span class="tag red">Fail ${pct}%</span>`}</td></tr>`}).join('')}</tbody></table>
+    <div class="modal-actions"><button class="btn sec" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveMarks('${eid}')">Save Marks</button></div>`);
+}
+function saveMarks(eid){
+  const e=DB.exams.find(x=>x.id===eid);
+  DB.students.filter(s=>s.cls===e.cls).forEach(s=>{
+    const v=$('#m_'+s.id).value.trim();
+    if(v!=='')e.marks[s.id]=Number(v);else delete e.marks[s.id];
+  });
+  save();closeModal();exams();
+}
+
+/* ============ SETTINGS ============ */
+function settings(){
+  const p=DB.profile;
+  $('#main').innerHTML=`
+   <div class="topbar"><h1>Settings</h1></div>
+   <div class="card"><h3>School Profile</h3>
+     <div class="field"><label>School Name</label><input id="p_name" value="${esc(p.name)}"></div>
+     <div class="row2"><div class="field"><label>Address</label><input id="p_address" value="${esc(p.address)}"></div>
+       <div class="field"><label>Session</label><input id="p_session" value="${esc(p.session)}"></div></div>
+     <button class="btn" onclick="saveProfile()">Save Profile</button>
+   </div>
+   <div class="card"><h3>Data Backup</h3>
+     <p style="color:var(--muted);font-size:.85rem;margin-bottom:12px">Export your data to a file for safekeeping, or import a previous backup.</p>
+     <div class="toolbar">
+       <button class="btn sec" onclick="exportData()">⬇ Export Backup</button>
+       <button class="btn sec" onclick="document.getElementById('imp').click()">⬆ Import Backup</button>
+       <input type="file" id="imp" accept=".json" class="hide" onchange="importData(event)">
+       <button class="btn danger" onclick="resetData()">Reset All Data</button>
+     </div>
+   </div>`;
+}
+function saveProfile(){
+  DB.profile={name:$('#p_name').value.trim(),address:$('#p_address').value.trim(),session:$('#p_session').value.trim()};
+  save();alert('Profile saved');
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='dps-dhumari-backup-'+today()+'.json';a.click();
+}
+function importData(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{try{DB=JSON.parse(r.result);save();alert('Data imported');render();}catch(e){alert('Invalid backup file')}};
+  r.readAsText(file);
+}
+function resetData(){if(confirm('Delete ALL data and restore samples? This cannot be undone.')){localStorage.removeItem(KEY);DB=seed();render();}}
+
+/* ============ SHARED ============ */
+function delItem(coll,iid){
+  if(!confirm('Delete this record?'))return;
+  DB[coll]=DB[coll].filter(x=>x.id!==iid);save();views[current]();
+}
+// tiny state store for filter inputs (kept across re-render within a view)
+const _state={};
+function _s(k){const el=document.getElementById(k);if(el)_state[k]=el.value;return _state[k]||''}
+function restore(k){const el=document.getElementById(k);if(el&&_state[k]!==undefined)el.value=_state[k]}
+
+render();
+</script>
+</body>
+</html>

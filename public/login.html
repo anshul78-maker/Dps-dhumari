@@ -5,12 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dhumari Public School ERP</title>
 <link rel="icon" type="image/jpeg" href="/img/logo.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+<!-- PWA -->
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#b0182b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DPS ERP">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body class="login-body">
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-crest-wrap">
+        <span class="splash-ring"></span>
+        <img class="splash-crest" src="/img/logo.jpg" alt="Dhumari Public School crest">
+      </div>
+      <div class="splash-name">Dhumari Public School</div>
+      <div class="splash-orn"><i></i><b></b><i></i></div>
+      <div class="splash-sub">Etah · Estd. 2002</div>
+      <div class="splash-bar"><span></span></div>
+      <div class="splash-dots"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
   <div class="home">
     <div class="home-head">
       <img class="home-crest" src="/img/logo.jpg" alt="Dhumari Public School crest">
@@ -21,7 +44,7 @@
     <p class="home-lead">Choose your role to open your dashboard</p>
 
     <div class="role-grid">
-      <button class="role-card" data-u="priya" data-p="priya123">
+      <button class="role-card" style="--i:0" data-u="nursery-a-1" data-p="student123">
         <span class="role-ic" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v4.5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5V12"/><path d="M22 10v5"/>
@@ -32,7 +55,7 @@
         <span class="role-go">Open dashboard →</span>
       </button>
 
-      <button class="role-card" data-u="verma" data-p="verma123">
+      <button class="role-card" style="--i:1" data-u="t3201744" data-p="teacher123">
         <span class="role-ic" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 9l2.4 2.4L15 7"/><path d="M12 16v4M8 20h8"/>
@@ -43,7 +66,7 @@
         <span class="role-go">Open dashboard →</span>
       </button>
 
-      <button class="role-card" data-u="nair" data-p="nair123">
+      <button class="role-card" style="--i:2" data-u="nair" data-p="nair123">
         <span class="role-ic" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9"/><path d="M9.5 8h5M9.5 11h5M13.5 8c.4 2.6-1.4 3.6-4 3.6l3.8 3.9"/>
@@ -53,11 +76,14 @@
         <span class="role-desc">Fees overview, add fees, mark paid &amp; transfer certificates</span>
         <span class="role-go">Open dashboard →</span>
       </button>
+
     </div>
 
     <div id="err" class="form-error" style="text-align:center"></div>
 
     <button class="link-btn" id="manualToggle" type="button">Sign in with a username and password instead</button>
+
+    <button class="btn btn-teal" id="installApp" type="button" hidden style="margin:14px auto 0;display:block">⬇ Install app on this device</button>
 
     <div class="manual" id="manual" hidden>
       <label class="field-label" for="u">Username</label>
@@ -70,5 +96,6 @@
 
   <script src="/js/api.js"></script>
   <script src="/js/login.js"></script>
+  <script src="/js/pwa.js"></script>
 </body>
 </html>

@@ -76,7 +76,7 @@ a{color:inherit}
 .home-title{font-size:27px;margin-top:16px}
 .home-sub{color:var(--ink-soft);font-size:13px;margin-top:5px;letter-spacing:.02em}
 .home-lead{text-align:center;color:var(--ink-soft);font-size:15px;margin:24px 0 18px}
-.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .role-card{display:flex;flex-direction:column;align-items:flex-start;gap:9px;text-align:left;
   background:#fbf6f3;border:1px solid var(--line);border-radius:16px;padding:20px 17px;cursor:pointer;
   font-family:inherit;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s,background .15s}
@@ -245,4 +245,169 @@ label.btn{position:relative;cursor:pointer}
   .side-foot .btn-block{width:auto;margin-top:0}
   .cols-3{grid-template-columns:1fr}
   .cols-2{grid-template-columns:1fr}
+}
+
+/* ============================================================
+   DESIGN UPGRADE — splash screen, motion & richer crest visuals
+   Palette pulled straight from the school crest: crimson + gold.
+   ============================================================ */
+
+/* ---- animation keywords ---- */
+@keyframes splashFade{to{opacity:0;visibility:hidden}}
+@keyframes crestPop{
+  0%{opacity:0;transform:scale(.6) translateY(12px)}
+  60%{opacity:1;transform:scale(1.06)}
+  100%{opacity:1;transform:scale(1)}}
+@keyframes barFill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes floatUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+@keyframes shimmer{to{background-position:200% 0}}
+
+/* ---- Splash / loading screen (premium, crest-matched) ---- */
+@keyframes haloGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+@keyframes nameSheen{to{background-position:200% 0}}
+@keyframes ornGrow{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+@keyframes dotPulse{0%,100%{opacity:.3}50%{opacity:1}}
+.splash{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:
+    radial-gradient(120% 90% at 50% -10%, #c11d31 0%, #9a1322 42%, #6a0d16 100%);
+  animation:splashFade .6s ease 2.3s forwards}
+.splash::before{ /* soft vignette to deepen the edges */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 60% at 50% 45%, transparent 40%, rgba(0,0,0,.35) 100%)}
+.splash::after{ /* warm gold aura behind the crest */
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(38% 30% at 50% 40%, rgba(230,194,96,.30), transparent 70%)}
+.splash-inner{position:relative;text-align:center;color:#fff}
+
+/* rotating gold halo + glowing crest */
+.splash-crest-wrap{position:relative;width:156px;height:156px;margin:0 auto;display:grid;place-items:center}
+.splash-ring{
+  position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,
+    rgba(230,194,96,0) 0deg, rgba(230,194,96,.15) 60deg,
+    #f0d27a 150deg, #c69214 200deg, rgba(230,194,96,.15) 300deg, rgba(230,194,96,0) 360deg);
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+          mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+  animation:ringSpin 3s linear infinite, haloGlow 2.4s ease-in-out infinite}
+.splash-crest{
+  position:relative;width:112px;height:112px;border-radius:24px;object-fit:cover;
+  box-shadow:0 20px 55px rgba(0,0,0,.5), 0 0 0 5px rgba(255,255,255,.14),
+             0 0 40px rgba(230,194,96,.35);
+  animation:crestPop .9s cubic-bezier(.2,.85,.25,1) both}
+
+/* school name with a slow gold sheen sweeping across white */
+.splash-name{
+  font-family:"Sora",sans-serif;font-weight:700;font-size:28px;margin-top:26px;
+  letter-spacing:.4px;
+  background:linear-gradient(100deg,#ffffff 0%,#ffffff 35%,#ffe6a8 50%,#ffffff 65%,#ffffff 100%);
+  background-size:200% 100%;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:floatUp .6s ease .35s both, nameSheen 3.2s ease-in-out .9s infinite}
+/* ornamental gold divider — two tapering lines around a diamond, echoing the crest */
+.splash-orn{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;
+  color:#e6c260;animation:floatUp .6s ease .5s both}
+.splash-orn i{display:block;width:44px;height:1.5px;transform-origin:center;
+  background:linear-gradient(90deg,transparent,#e6c260);animation:ornGrow .7s ease .55s both}
+.splash-orn i:last-child{background:linear-gradient(90deg,#e6c260,transparent)}
+.splash-orn b{width:7px;height:7px;background:#e6c260;transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(230,194,96,.7)}
+.splash-sub{
+  font-size:12px;opacity:.9;margin-top:12px;letter-spacing:.28em;text-transform:uppercase;
+  color:#f6e6c4;animation:floatUp .6s ease .62s both}
+/* refined loader: thin gold bar + three pulsing dots */
+.splash-bar{
+  width:160px;height:3px;border-radius:4px;background:rgba(255,255,255,.18);
+  margin:26px auto 0;overflow:hidden}
+.splash-bar>span{
+  display:block;height:100%;border-radius:4px;transform-origin:left;
+  background:linear-gradient(90deg,#f0d27a,#c69214);animation:barFill 1.9s ease .15s both}
+.splash-dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.splash-dots span{width:6px;height:6px;border-radius:50%;background:#e6c260;
+  animation:dotPulse 1.2s ease-in-out infinite}
+.splash-dots span:nth-child(2){animation-delay:.2s}
+.splash-dots span:nth-child(3){animation-delay:.4s}
+
+/* ---- entrance motion for the real UI ---- */
+.login-body .home,.login-body .login-card{animation:floatUp .55s ease both}
+.role-card{animation:floatUp .5s ease both;animation-delay:calc(.06s * var(--i, 0))}
+.card{animation:floatUp .5s ease both;animation-delay:calc(.05s * var(--i, 0))}
+.nav-item{animation:floatUp .4s ease both;animation-delay:calc(.04s * var(--i, 0))}
+
+/* ---- richer crest visuals ---- */
+.login-body{
+  background:
+    radial-gradient(900px 420px at 50% -8%, #f7dfe2, transparent 70%),
+    radial-gradient(700px 380px at 90% 110%, #f6ecd6, transparent 70%),
+    var(--bg)}
+.btn-primary{
+  background:linear-gradient(135deg,#b0182b,#8c111f);
+  box-shadow:0 6px 16px rgba(176,24,43,.28)}
+.btn-primary:hover{background:linear-gradient(135deg,#c11d31,#7a0f1b);
+  box-shadow:0 8px 22px rgba(176,24,43,.36);transform:translateY(-1px)}
+.btn-teal{background:linear-gradient(135deg,#e0b64a,#c69214)}
+.btn-teal:hover{background:linear-gradient(135deg,#e9c65f,#a97c0e)}
+.role-ic{
+  background:linear-gradient(135deg,#fbe4e8,#f6ecd3);
+  box-shadow:inset 0 0 0 1px rgba(198,146,20,.18)}
+.role-card:hover .role-ic{
+  background:linear-gradient(135deg,#b0182b,#c69214);color:#fff;transform:scale(1.05)}
+.role-ic{transition:background .2s,color .2s,transform .2s}
+.nav-item.active{
+  background:linear-gradient(135deg,#fbe9ec,#f9f0dd);
+  box-shadow:inset 3px 0 0 var(--navy)}
+.brand-name{
+  background:linear-gradient(90deg,#b0182b,#c69214);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat-num{
+  background:linear-gradient(120deg,#8c111f,#c69214);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.topbar{position:relative;padding-bottom:16px}
+.topbar::after{
+  content:"";position:absolute;left:0;bottom:0;width:60px;height:3px;border-radius:3px;
+  background:linear-gradient(90deg,#b0182b,#c69214)}
+.card{transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(60,20,25,.06),0 16px 40px rgba(60,20,25,.12)}
+
+/* respect users who prefer no motion */
+@media (prefers-reduced-motion:reduce){
+  .splash{animation:splashFade .4s ease .6s forwards}
+  .splash-crest,.splash-name,.splash-sub,.splash-bar>span,.splash-ring,.splash-orn,
+  .splash-orn i,.splash-dots span,
+  .role-card,.card,.nav-item,.login-body .home,.login-body .login-card{animation:none}
+  .splash-name{-webkit-text-fill-color:#fff;color:#fff}
+}
+
+/* ---------------- Student roster table (accountant) ---------------- */
+.roster-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.roster-search{position:relative;flex:1;min-width:220px}
+.roster-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  width:17px;height:17px;color:var(--ink-soft);pointer-events:none}
+.roster-search input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--line);
+  border-radius:11px;font-size:14px;font-family:inherit;background:#fbf7f4;outline:none;
+  transition:border-color .15s,box-shadow .15s}
+.roster-search input:focus{border-color:var(--navy);background:#fff;
+  box-shadow:0 0 0 3px rgba(176,24,43,.1)}
+.roster-select{padding:11px 14px;border:1px solid var(--line);border-radius:11px;
+  font-size:14px;font-family:inherit;background:#fbf7f4;color:var(--ink);cursor:pointer;outline:none}
+.roster-select:focus{border-color:var(--navy);background:#fff}
+.roster-count{margin-left:auto;font-size:13px;font-weight:600;color:var(--navy);
+  background:#fbe9ec;padding:6px 12px;border-radius:20px;white-space:nowrap}
+.roster-scroll{max-height:62vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.roster-table{margin:0}
+.roster-table thead th{position:sticky;top:0;z-index:2;background:#fbf1f2;
+  border-bottom:2px solid #f2d3d8;box-shadow:0 1px 0 #f2d3d8}
+.roster-table td,.roster-table th{padding:11px 14px;white-space:nowrap}
+.roster-table tbody tr{transition:background .12s}
+.roster-table tbody tr:nth-child(even){background:#fbf7f4}
+.roster-table tbody tr:hover td{background:#fbe9ec}
+.roster-roll{font-family:"Sora",sans-serif;font-weight:700;color:var(--ink-soft);text-align:center}
+.roster-name{font-weight:600}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;
+  background:linear-gradient(135deg,#fbe9ec,#f9f0dd);color:var(--navy-700);
+  border:1px solid #f2d9c9}
+@media (max-width:640px){
+  .roster-count{margin-left:0}
+  .roster-scroll{max-height:70vh}
 }

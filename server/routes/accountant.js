@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../auth.js";
 import {
-  allStudents, addFee, addFeeToClass, markFeePaid, allFees, getFeeById,
+  allStudents, studentsRoster, addFee, addFeeToClass, markFeePaid, allFees, getFeeById,
   getUserById, addDocument, documentsByType
 } from "../db.js";
 import { savePdfFromDataUrl } from "../files.js";
@@ -21,6 +21,11 @@ router.get("/overview", (req, res) => {
   const totalDue = fees.filter(f => f.status === "due").reduce((s, f) => s + f.amount, 0);
   const totalPaid = fees.filter(f => f.status === "paid").reduce((s, f) => s + f.amount, 0);
   res.json({ students: allStudents(), fees, totalDue, totalPaid });
+});
+
+// Full student roster for the Students table
+router.get("/students", (req, res) => {
+  res.json({ students: studentsRoster() });
 });
 
 // Add a fee to a single student

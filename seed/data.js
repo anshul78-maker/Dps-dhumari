@@ -1,133 +1,94 @@
-// All starting data. Loaded into the database on first run.
-// Edit values here and run `npm run seed` to reset the database to this.
+// All starting data for the ERP. Loaded into the database on first run.
+//
+// Students and teachers are the school's REAL roster, imported from the office
+// spreadsheets into seed/students.json and seed/teachers.json. Sensitive fields
+// (Aadhaar, home address, caste, bank account, IFSC) are intentionally NOT
+// imported. To refresh from new spreadsheets, regenerate those JSON files and
+// run `npm run seed`.
+
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const readJson = (f) => JSON.parse(fs.readFileSync(path.join(__dirname, f), "utf-8"));
+
+const students = readJson("students.json"); // [{username,password,role,name,className,roll,admissionNo,gender,dob,guardianName,motherName,phone}]
+const teachers = readJson("teachers.json"); // [{username,password,role,name,employeeId,gender,dob,designation,qualification,gradesTaught}]
 
 // -------------------- USERS --------------------
-// role is one of: "student", "teacher", "accountant"
+// role is one of: "student", "teacher", "accountant". (No "admin" role.)
 // Passwords are hashed automatically on seed.
 
-export const users = [
-  // ---- Students (Class 8-A) ----
-  { username: "priya",  password: "priya123",  role: "student", name: "Priya Sharma",  className: "Class 8-A", roll: 14 },
-  { username: "arjun",  password: "arjun123",  role: "student", name: "Arjun Verma",   className: "Class 8-A", roll: 5  },
-  { username: "sara",   password: "sara123",   role: "student", name: "Sara Khan",     className: "Class 8-A", roll: 22 },
+// One office/accountant login for the fees & certificates desk.
+const accountant = {
+  username: "nair", password: "nair123", role: "accountant", name: "Office (Accounts)",
+  employeeId: "EMP-201", designation: "Accountant", email: "office@dpsdhumari.edu", joiningDate: "2016-09-01"
+};
 
-  // ---- Teachers ----
-  // subjects/classes they teach are set in `teaching` below.
-  { username: "verma",  password: "verma123",  role: "teacher", name: "Mr. Verma" },
-  { username: "iyer",   password: "iyer123",   role: "teacher", name: "Ms. Iyer" },
+export const users = [...teachers, accountant, ...students];
 
-  // ---- Accountant ----
-  { username: "nair",   password: "nair123",   role: "accountant", name: "Mr. Nair" }
-];
+// -------------------- CLASSES --------------------
+// Distinct classes the school runs, taken from the student roster and sorted in
+// natural school order (Nursery → LKG → UKG → Class 1 … Class 12, section A→C).
+function classSortKey(name) {
+  const pre = { "Nursery": 0, "LKG": 1, "UKG": 2 };
+  const m = name.match(/^(Nursery|LKG|UKG|Class\s+(\d+))-([A-Z])$/);
+  if (!m) return [99, 0, name];
+  const grade = m[2] ? 2 + Number(m[2]) : pre[m[1]];
+  const section = m[3].charCodeAt(0);
+  return [grade, section, ""];
+}
+const classNames = [...new Set(students.map(s => s.className))]
+  .sort((a, b) => {
+    const ka = classSortKey(a), kb = classSortKey(b);
+    return ka[0] - kb[0] || ka[1] - kb[1] || String(ka[2]).localeCompare(String(kb[2]));
+  });
+export const classes = classNames.map(name => ({ name, classTeacher: null }));
 
 // -------------------- WHO TEACHES WHAT --------------------
-// Each teacher can teach several subjects in a class.
-export const teaching = [
-  { teacher: "verma", className: "Class 8-A", subject: "Mathematics" },
-  { teacher: "verma", className: "Class 8-A", subject: "Science" },
-  { teacher: "iyer",  className: "Class 8-A", subject: "English" },
-  { teacher: "iyer",  className: "Class 8-A", subject: "Social Studies" }
-];
+// Each teacher's spreadsheet lists the grades they teach (e.g. ["8","9","10"]).
+// We map each grade to that grade's actual sections and assign a placeholder
+// "General" subject — teachers can add real subjects/marks from their dashboard.
+const bySection = {}; // grade number -> ["Class 8-A", "Class 8-B", ...]
+for (const name of classNames) {
+  const m = name.match(/^Class\s+(\d+)-[A-Z]$/);
+  if (m) (bySection[m[1]] ||= []).push(name);
+}
+export const subjects = ["General"];
+export const teaching = [];
+for (const t of teachers) {
+  const seen = new Set();
+  for (const g of (t.gradesTaught || [])) {
+    for (const cls of (bySection[g] || [])) {
+      if (seen.has(cls)) continue;
+      seen.add(cls);
+      teaching.push({ teacher: t.username, className: cls, subject: "General" });
+    }
+  }
+}
 
-export const subjects = ["Mathematics", "Science", "English", "Social Studies"];
+// -------------------- ACADEMIC DATA --------------------
+// Starts empty — teachers enter marks/attendance/assignments and the accountant
+// adds fees from within the app for the real students.
+export const exams = [];
+export const marks = [];
+export const attendance = [];
+export const assignments = [];
+export const fees = [];
 
-// -------------------- MARKS --------------------
-// Several exams across the year so the student's growth line is meaningful.
-// Each row: student username, subject, exam name, score, max.
-// Exams are listed oldest -> newest (order matters for the trend).
-export const exams = ["Unit Test 1", "Mid Term", "Unit Test 2", "Final Term"];
-
-export const marks = [
-  // Priya — steady growth
-  ["priya", "Mathematics",   "Unit Test 1", 62, 100],
-  ["priya", "Mathematics",   "Mid Term",    68, 100],
-  ["priya", "Mathematics",   "Unit Test 2", 74, 100],
-  ["priya", "Mathematics",   "Final Term",  80, 100],
-  ["priya", "Science",       "Unit Test 1", 58, 100],
-  ["priya", "Science",       "Mid Term",    64, 100],
-  ["priya", "Science",       "Unit Test 2", 69, 100],
-  ["priya", "Science",       "Final Term",  72, 100],
-  ["priya", "English",       "Unit Test 1", 75, 100],
-  ["priya", "English",       "Mid Term",    78, 100],
-  ["priya", "English",       "Unit Test 2", 80, 100],
-  ["priya", "English",       "Final Term",  82, 100],
-  ["priya", "Social Studies","Unit Test 1", 70, 100],
-  ["priya", "Social Studies","Mid Term",    72, 100],
-  ["priya", "Social Studies","Unit Test 2", 71, 100],
-  ["priya", "Social Studies","Final Term",  74, 100],
-
-  // Arjun
-  ["arjun", "Mathematics",   "Unit Test 1", 80, 100],
-  ["arjun", "Mathematics",   "Mid Term",    82, 100],
-  ["arjun", "Mathematics",   "Unit Test 2", 79, 100],
-  ["arjun", "Mathematics",   "Final Term",  85, 100],
-  ["arjun", "Science",       "Unit Test 1", 72, 100],
-  ["arjun", "Science",       "Mid Term",    75, 100],
-  ["arjun", "Science",       "Unit Test 2", 77, 100],
-  ["arjun", "Science",       "Final Term",  80, 100],
-  ["arjun", "English",       "Unit Test 1", 65, 100],
-  ["arjun", "English",       "Mid Term",    68, 100],
-  ["arjun", "English",       "Unit Test 2", 70, 100],
-  ["arjun", "English",       "Final Term",  73, 100],
-  ["arjun", "Social Studies","Unit Test 1", 68, 100],
-  ["arjun", "Social Studies","Mid Term",    70, 100],
-  ["arjun", "Social Studies","Unit Test 2", 72, 100],
-  ["arjun", "Social Studies","Final Term",  75, 100],
-
-  // Sara
-  ["sara", "Mathematics",   "Unit Test 1", 55, 100],
-  ["sara", "Mathematics",   "Mid Term",    60, 100],
-  ["sara", "Mathematics",   "Unit Test 2", 63, 100],
-  ["sara", "Mathematics",   "Final Term",  66, 100],
-  ["sara", "Science",       "Unit Test 1", 60, 100],
-  ["sara", "Science",       "Mid Term",    62, 100],
-  ["sara", "Science",       "Unit Test 2", 65, 100],
-  ["sara", "Science",       "Final Term",  68, 100],
-  ["sara", "English",       "Unit Test 1", 78, 100],
-  ["sara", "English",       "Mid Term",    80, 100],
-  ["sara", "English",       "Unit Test 2", 83, 100],
-  ["sara", "English",       "Final Term",  85, 100],
-  ["sara", "Social Studies","Unit Test 1", 66, 100],
-  ["sara", "Social Studies","Mid Term",    69, 100],
-  ["sara", "Social Studies","Unit Test 2", 70, 100],
-  ["sara", "Social Studies","Final Term",  72, 100]
-];
-
-// -------------------- ATTENDANCE --------------------
-// A few recent days per student: 1 = present, 0 = absent.
-export const attendance = [
-  ["priya", "2026-02-02", 1], ["priya", "2026-02-03", 1], ["priya", "2026-02-04", 0],
-  ["priya", "2026-02-05", 1], ["priya", "2026-02-06", 1],
-  ["arjun", "2026-02-02", 1], ["arjun", "2026-02-03", 0], ["arjun", "2026-02-04", 1],
-  ["arjun", "2026-02-05", 1], ["arjun", "2026-02-06", 1],
-  ["sara",  "2026-02-02", 1], ["sara",  "2026-02-03", 1], ["sara",  "2026-02-04", 1],
-  ["sara",  "2026-02-05", 0], ["sara",  "2026-02-06", 1]
-];
-
-// -------------------- ASSIGNMENTS --------------------
-// title, class, subject, details, due date, teacher username.
-export const assignments = [
-  ["Algebra worksheet 4",       "Class 8-A", "Mathematics",   "Solve Q1–Q10 on quadratic equations.", "2026-02-12", "verma"],
-  ["Chemistry: balancing eqns", "Class 8-A", "Science",       "Balance the 8 equations on page 44.",   "2026-02-10", "verma"],
-  ["Essay: My favourite book",  "Class 8-A", "English",       "Write 300 words. Bring to class.",       "2026-02-13", "iyer"]
-];
-
-// -------------------- FEES --------------------
-// student username, title, amount, period, status (due|paid).
-export const fees = [
-  ["priya", "Tuition fee",  2500, "January 2026",  "paid"],
-  ["priya", "Tuition fee",  2500, "February 2026", "due"],
-  ["priya", "Bus fee",       800, "February 2026", "due"],
-  ["arjun", "Tuition fee",  2500, "February 2026", "due"],
-  ["sara",  "Tuition fee",  2500, "January 2026",  "paid"],
-  ["sara",  "Tuition fee",  2500, "February 2026", "due"]
-];
+// -------------------- SCHOOL SETTINGS --------------------
+export const settings = {
+  school_name: "Dhumari Public School",
+  address: "Dhumari, Etah, Uttar Pradesh",
+  session_year: "2026-27",
+  logo_text: "DPS"
+};
 
 // -------------------- NOTICES --------------------
 // author username, title, message, audience ("all" or a class name).
-// Teachers and the accountant post these; students see "all" + their class.
 export const notices = [
-  ["nair",  "Fee deadline extended", "February tuition can now be paid up to the 20th without a late charge.", "all"],
-  ["iyer",  "Parent–teacher meeting", "PTM for Class 8-A is on Saturday 14th Feb, 10 AM in the main hall.", "Class 8-A"],
-  ["verma", "Science lab reopens", "The science lab is back in use from Monday. Wear closed shoes for practicals.", "all"]
+  ["nair", "Welcome to the DPS ERP",
+    "The new school ERP is live. Teachers can mark attendance and enter marks; the accounts desk manages fees and certificates.",
+    "all"]
 ];
