@@ -33,6 +33,20 @@ Stop the server with **Ctrl + C** in the terminal.
 
 ---
 
+## Deploy it (HTTPS, for real users / the mobile app)
+
+To run the backend on a public HTTPS URL with data that survives restarts (so
+the mobile app can reach it), this repo ships a ready-to-use **Render
+Blueprint** ([`render.yaml`](render.yaml)): it builds, starts the server,
+generates a real `JWT_SECRET`, serves over HTTPS, and keeps `data.db` +
+`uploads/` on a persistent disk (via the `DATA_DIR` env var).
+
+See **[DEPLOY.md](DEPLOY.md)** for the step-by-step guide, the cost note (the
+persistent disk needs a paid plan; a free trial option is described), CORS, and
+alternative hosts.
+
+---
+
 ## Demo logins
 
 | Role        | Username | Password  |

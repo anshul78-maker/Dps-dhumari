@@ -8,7 +8,12 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const UPLOADS_DIR = path.join(__dirname, "..", "uploads");
+// On a host with a persistent disk (e.g. Render), set DATA_DIR to the mount
+// path so uploaded PDFs survive restarts. Unset, uploads land in ./uploads.
+const DATA_DIR = process.env.DATA_DIR;
+export const UPLOADS_DIR = DATA_DIR
+  ? path.join(DATA_DIR, "uploads")
+  : path.join(__dirname, "..", "uploads");
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 export const MAX_PDF_BYTES = 5 * 1024 * 1024; // 5 MB
