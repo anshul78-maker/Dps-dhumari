@@ -9,7 +9,7 @@ const Notices = {
     try { d = await API.get("/api/notices"); }
     catch (e) { view().innerHTML = `<div class="card"><div class="empty">${esc(e.message)}</div></div>`; return; }
 
-    const canPost = d.role === "teacher" || d.role === "accountant";
+    const canPost = d.role === "teacher" || d.role === "accountant" || d.role === "admin";
     view().innerHTML = "";
 
     if (canPost) view().appendChild(this.composer());

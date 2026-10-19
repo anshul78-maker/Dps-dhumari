@@ -13,8 +13,8 @@ router.get("/", (req, res) => {
   res.json({ notices: noticesFor(me), role: me.role });
 });
 
-// Only staff (teacher or accountant) can post a notice.
-router.post("/", requireRole("teacher", "accountant"), (req, res) => {
+// Only staff (teacher, accountant or admin) can post a notice.
+router.post("/", requireRole("teacher", "accountant", "admin"), (req, res) => {
   const me = getUserById(req.user.id);
   const title = String(req.body?.title || "").trim();
   const body = String(req.body?.body || "").trim();
@@ -27,11 +27,11 @@ router.post("/", requireRole("teacher", "accountant"), (req, res) => {
   res.json({ ok: true });
 });
 
-// The author (or an accountant, as admin) can remove a notice.
-router.delete("/:id", requireRole("teacher", "accountant"), (req, res) => {
+// The author (or an accountant/admin, acting as office staff) can remove a notice.
+router.delete("/:id", requireRole("teacher", "accountant", "admin"), (req, res) => {
   const notice = getNoticeById(Number(req.params.id));
   if (!notice) return res.status(404).json({ error: "Notice not found" });
-  if (notice.author_id !== req.user.id && req.user.role !== "accountant")
+  if (notice.author_id !== req.user.id && !["accountant", "admin"].includes(req.user.role))
     return res.status(403).json({ error: "You can only remove your own notices" });
   deleteNotice(notice.id);
   res.json({ ok: true });

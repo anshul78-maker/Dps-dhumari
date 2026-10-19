@@ -1,9 +1,9 @@
 # Dhumari Public School — ERP
 
-A full-stack school ERP with three roles — **Student, Teacher, Accountant** —
-sharing one database. No AI. Plain Node.js + Express + SQLite backend and
-vanilla HTML/CSS/JS frontend, so it runs anywhere with nothing to compile.
-Themed in the school's crimson-and-gold crest colours.
+A full-stack school ERP with four roles — **Admin, Student, Teacher,
+Accountant** — sharing one database. No AI. Plain Node.js + Express + SQLite
+backend and vanilla HTML/CSS/JS frontend, so it runs anywhere with nothing to
+compile. Themed in the school's crimson-and-gold crest colours.
 
 ---
 
@@ -37,6 +37,7 @@ Stop the server with **Ctrl + C** in the terminal.
 
 | Role        | Username | Password  |
 |-------------|----------|-----------|
+| Admin       | `admin`  | `admin123`|
 | Student     | `priya`  | `priya123`|
 | Teacher     | `verma`  | `verma123`|
 | Accountant  | `nair`   | `nair123` |
@@ -47,6 +48,18 @@ Second teacher (English & Social Studies): `iyer` / `iyer123`.
 ---
 
 ## What each role can do
+
+**Admin**
+- Dashboard — student/staff/class counts, fee totals, today's attendance
+- Students & Staff — add, edit and delete accounts (profile fields like
+  admission no., guardian, employee ID, designation…)
+- Teaching assignments — hook a teacher up to the classes/subjects they teach
+- Classes & Sections — create classes, assign a class teacher, rename
+  (cascades everywhere that class name is used), see student counts
+- Attendance — read-only overview of a class on a date
+- Fees — set up a fee structure for a whole class (the accountant collects it)
+- Examinations & Results — per-exam totals, percentage and pass/fail
+- Notices, and the school profile under Settings
 
 **Student** (sees only their own data)
 - Dashboard: overall average, attendance ring, **real class rank** (by latest
@@ -95,6 +108,7 @@ school-erp/
 │       ├── student.js      dashboard, assignments (+PDF submit), documents, fees
 │       ├── teacher.js      classes, attendance, marks, assignments, submissions, report cards
 │       ├── accountant.js   fees overview, add fee, mark paid, transfer certificates
+│       ├── admin.js        students, staff, classes, exams, attendance overview, settings
 │       ├── notices.js      list / post / delete notices (shared)
 │       └── files.js        authenticated PDF downloads (submissions + documents)
 ├── public/                 the website the browser loads
@@ -102,7 +116,7 @@ school-erp/
 │   ├── index.html          app shell (sidebar changes per role)
 │   ├── css/styles.css
 │   └── js/                 api.js, login.js, app.js, notices.js,
-│                           student.js, teacher.js, accountant.js
+│                           student.js, teacher.js, accountant.js, admin.js
 ├── uploads/                stored PDF files (created on first upload)
 ├── seed/data.js            all demo data — edit, then `npm run seed`
 ├── .env.example
